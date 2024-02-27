@@ -10,6 +10,22 @@ from commands.api_keys import (
     create_external_api_key,
     get_external_api_keys,
     get_external_api_key,
+    update_external_api_key,
+    delete_external_api_key,
+)
+from commands.collections import (
+    create_collection,
+    delete_collection,
+    get_collection,
+    list_collections,
+    update_collection,
+)
+from commands.upload import upload_embedding, upload_documents
+from commands.search import (
+    embedding_search,
+    more_like_these_search,
+    more_like_this_search,
+    semantic_search,
 )
 from vantage_cli.util import create_client, create_printer
 
@@ -48,6 +64,19 @@ cli.add_command(get_vantage_api_keys)
 cli.add_command(create_external_api_key)
 cli.add_command(get_external_api_keys)
 cli.add_command(get_external_api_key)
+cli.add_command(update_external_api_key)
+cli.add_command(delete_external_api_key)
+cli.add_command(create_collection)
+cli.add_command(delete_collection)
+cli.add_command(get_collection)
+cli.add_command(list_collections)
+cli.add_command(update_collection)
+cli.add_command(upload_embedding)
+cli.add_command(upload_documents)
+cli.add_command(embedding_search)
+cli.add_command(more_like_these_search)
+cli.add_command(more_like_this_search)
+cli.add_command(semantic_search)
 
 if __name__ == "__main__":
     cli()  # pragma: no cover

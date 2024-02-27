@@ -91,3 +91,15 @@ def get_external_api_key(ctx, key_id):
         content_type=ContentType.OBJECT,
     )
     printer.print(response)
+
+
+@click.command("update-external-api-key")
+@click.pass_obj
+def update_external_api_key(ctx):
+    click.echo("Not implemented.")
+
+
+@click.command("delete-external-api-key")
+@click.pass_obj
+def delete_external_api_key(ctx):
+    click.echo("Not implemented.")
