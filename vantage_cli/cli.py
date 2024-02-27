@@ -4,8 +4,8 @@
 
 import click
 from command import CommandParser
-from vantage import Vantage
-
+from vantage import VantageClient
+from printer import Printer, OutputType
 
 DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
@@ -50,16 +50,25 @@ DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
         ]
     ),
 )
-def main(jwt_token, account_id, command):
-    client = Vantage.using_jwt_token(
+@click.option(
+    "-o", "--output-type", type=click.Choice(["json", "csv"]), default="json"
+)
+@click.argument("command_arguments", nargs=-1)
+def main(jwt_token, account_id, command, command_arguments, output_type):
+    client = VantageClient.using_jwt_token(
         vantage_api_jwt_token=jwt_token,
         api_host=DEFAULT_API_HOST,
         account_id=account_id,
     )
 
     parser = CommandParser(client=client)
-    command = parser.parse(command=command, account_id=account_id)
-    click.echo(command.execute())
+    printer = Printer(output_type=OutputType[output_type.upper()])
+    command = parser.parse(
+        command=command,
+        account_id=account_id,
+        command_arguments=command_arguments,
+    )
+    click.echo(printer.parse(command.execute()))
 
 
 if __name__ == "__main__":
