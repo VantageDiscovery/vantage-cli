@@ -5,7 +5,7 @@ from printer import Printable, ContentType
 @click.command("get-vantage-api-keys")
 @click.pass_obj
 def get_vantage_api_keys(ctx):
-    """Fetches Vantage API keys from an account."""
+    """Lists existing Vantage API keys."""
     client = ctx["client"]
     printer = ctx["printer"]
 
@@ -21,7 +21,7 @@ def get_vantage_api_keys(ctx):
 @click.pass_obj
 def get_vantage_api_key(ctx, key_id):
     """
-    Fetches a specific Vantage API key from an account.
+    Shows a specific Vantage API key details.
 
     id: Vantage API key ID.
     """
@@ -42,7 +42,7 @@ def get_vantage_api_key(ctx, key_id):
 @click.pass_obj
 def create_external_api_key(ctx, llm_provider, llm_secret, url):
     """
-    Fetches a specific Vantage API key from an account.
+    Creates new external API key.
 
     id: Vantage API key ID.
     """
@@ -63,7 +63,7 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
 @click.command("get-external-api-keys")
 @click.pass_obj
 def get_external_api_keys(ctx):
-    """Fetches external API keys from an account."""
+    """Lists existing external API keys."""
     client = ctx["client"]
     printer = ctx["printer"]
 
@@ -79,7 +79,7 @@ def get_external_api_keys(ctx):
 @click.pass_obj
 def get_external_api_key(ctx, key_id):
     """
-    Fetches a specific external API key from an account.
+    Shows a specific external API key details.
 
     id: External API key ID.
     """
@@ -96,10 +96,12 @@ def get_external_api_key(ctx, key_id):
 @click.command("update-external-api-key")
 @click.pass_obj
 def update_external_api_key(ctx):
+    """Updates external API key data."""
     click.echo("Not implemented.")
 
 
 @click.command("delete-external-api-key")
 @click.pass_obj
 def delete_external_api_key(ctx):
+    """Deletes external API key."""
     click.echo("Not implemented.")
