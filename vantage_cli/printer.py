@@ -3,6 +3,7 @@ from typing import Any
 import jsonpickle
 import csv
 from io import StringIO
+import click
 
 
 class ContentType(Enum):
@@ -61,4 +62,4 @@ class Printer:
             return self._print_plaintext(printable.content)
 
     def print(self, content) -> None:
-        print(content)
+        click.echo(self.parse(content))

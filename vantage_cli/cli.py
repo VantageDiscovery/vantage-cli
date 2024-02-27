@@ -3,15 +3,25 @@
 """Console script for vantage_cli."""
 
 import click
-from command import CommandParser
-from vantage import VantageClient
-from printer import Printer, OutputType
+from commands.account import get_account, update_account
+from commands.api_keys import (
+    get_vantage_api_key,
+    get_vantage_api_keys,
+    create_external_api_key,
+    get_external_api_keys,
+    get_external_api_key,
+)
+from vantage_cli.util import create_client, create_printer
 
-DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
-DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
 
-
-@click.command("vantage")
+@click.group()
+@click.option(
+    "-a",
+    "--account-id",
+    envvar="VANTAGE_ACCOUNT_ID",
+    type=click.STRING,
+    default=None,
+)
 @click.option(
     "-t",
     "--jwt-token",
@@ -19,57 +29,25 @@ DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
     type=click.STRING,
     default=None,
 )
-@click.option("-a", "--account-id", type=click.STRING, default=None)
-@click.option(
-    "-c",
-    "--command",
-    type=click.Choice(
-        [
-            "get-account",
-            "update-account",
-            "get-vantage-api-key",
-            "get-vantage-api-keys",
-            "create-external-api-key",
-            "get-external-api-key",
-            "get-external-api-keys",
-            "update-external-api-key",
-            "delete-external-api-key",
-            "list-collections",
-            "create-collection",
-            "get-collection",
-            "update-collection",
-            "delete-collection",
-            "upload-embedding",  # This is most likely impractical for CLI
-            "upload-embedding-by-path",
-            "embedding-search",
-            "semantic-search",
-            "more-like-this-search",
-            "more-like-these-search",
-            "upload-documents-from-jsonl",  # This is most likely impractical for CLI
-            "upload-documents-from-path",
-        ]
-    ),
-)
 @click.option(
     "-o", "--output-type", type=click.Choice(["json", "csv"]), default="json"
 )
-@click.argument("command_arguments", nargs=-1)
-def main(jwt_token, account_id, command, command_arguments, output_type):
-    client = VantageClient.using_jwt_token(
-        vantage_api_jwt_token=jwt_token,
-        api_host=DEFAULT_API_HOST,
-        account_id=account_id,
+@click.pass_context
+def cli(ctx, account_id, jwt_token, output_type):
+    ctx.ensure_object(dict)
+    ctx.obj["client"] = create_client(
+        jwt_token=jwt_token, account_id=account_id
     )
+    ctx.obj["printer"] = create_printer(output_type=output_type)
 
-    parser = CommandParser(client=client)
-    printer = Printer(output_type=OutputType[output_type.upper()])
-    command = parser.parse(
-        command=command,
-        account_id=account_id,
-        command_arguments=command_arguments,
-    )
-    click.echo(printer.parse(command.execute()))
 
+cli.add_command(get_account)
+cli.add_command(update_account)
+cli.add_command(get_vantage_api_key)
+cli.add_command(get_vantage_api_keys)
+cli.add_command(create_external_api_key)
+cli.add_command(get_external_api_keys)
+cli.add_command(get_external_api_key)
 
 if __name__ == "__main__":
-    main()  # pragma: no cover
+    cli()  # pragma: no cover
