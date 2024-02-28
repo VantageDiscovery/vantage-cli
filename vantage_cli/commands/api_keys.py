@@ -30,15 +30,7 @@ def get_vantage_api_keys(ctx):
 @click.argument("key_id", type=click.STRING)
 @click.pass_obj
 def get_vantage_api_key(ctx, key_id):
-    """
-    Shows a specific Vantage API key details.
-
-    usage:
-        get-vantage-api-key <id>
-
-    arguments:
-        id: Vantage API key ID.
-    """
+    """Shows a specific Vantage API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
@@ -62,22 +54,22 @@ def get_vantage_api_key(ctx, key_id):
 
 
 @click.command("create-external-api-key")
-@click.option("--llm-provider", type=click.STRING)
-@click.option("--llm-secret", type=click.STRING)
-@click.option("--url", type=click.STRING, required=False)
+@click.option(
+    "--llm-provider",
+    type=click.STRING,
+    help="LLM provider ID supported by Vantage. Currently either \"OpenAPI\" or \"Hugging\".",
+)
+@click.option(
+    "--llm-secret",
+    type=click.STRING,
+    help="Secret key used to access LLM provider's API",
+)
+@click.option(
+    "--url", type=click.STRING, required=False, help="Currently not used"
+)
 @click.pass_obj
 def create_external_api_key(ctx, llm_provider, llm_secret, url):
-    """
-    Creates new external API key.
-
-    usage:
-        get-external-api-key [OPTIONS]
-
-    optons:
-        --llm-provider : LLM provider ID supported by Vantage. Currently either "OpenAPI" or "Hugging".
-        --llm-secret   : Secret key used to access LLM provider's API
-        --url          : Currently not used.
-    """
+    """Creates new external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
@@ -124,15 +116,7 @@ def get_external_api_keys(ctx):
 @click.argument("key_id", type=click.STRING)
 @click.pass_obj
 def get_external_api_key(ctx, key_id):
-    """
-    Shows a specific external API key details.
-
-    usage:
-        get-external-api-key <id>
-
-    arguments:
-        id: External API key ID.
-    """
+    """Shows a specific external API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
@@ -154,26 +138,23 @@ def get_external_api_key(ctx, key_id):
 
 
 @click.command("update-external-api-key")
-@click.option("--llm-provider", type=click.STRING)
-@click.option("--llm-secret", type=click.STRING)
-@click.option("--url", type=click.STRING, required=False)
+@click.option(
+    "--llm-provider",
+    type=click.STRING,
+    help="LLM provider ID supported by Vantage. Currently either \"OpenAPI\" or \"Hugging\".",
+)
+@click.option(
+    "--llm-secret",
+    type=click.STRING,
+    help="Secret key used to access LLM provider's API",
+)
+@click.option(
+    "--url", type=click.STRING, required=False, help="Currently not used"
+)
 @click.argument("key_id", type=click.STRING)
 @click.pass_obj
 def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
-    """
-    Updates external API key data.
-
-    usage:
-        update-exteral-api-key [OPTIONS] <id>
-
-    arguments:
-        id             : External API key ID.
-
-    options:
-        --llm-provider : LLM provider ID supported by Vantage. Currently either "OpenAPI" or "Hugging".
-        --llm-secret   : Secret key used to access LLM provider's API
-        --url          : Currently not used.
-    """
+    """Updates external API key data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
@@ -203,15 +184,7 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
 @click.argument("key_id", type=click.STRING)
 @click.pass_obj
 def delete_external_api_key(ctx, key_id):
-    """
-    Deletes external API key.
-
-    usage:
-        delete-external-api-key <id>
-
-    arguments:
-        id             : External API key ID.
-    """
+    """Deletes external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 

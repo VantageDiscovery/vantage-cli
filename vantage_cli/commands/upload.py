@@ -1,7 +1,7 @@
 import click
 
 
-@click.command("upload-parquet")
+@click.command("upload-parquet", help="Not Implemented.")
 @click.pass_obj
 def upload_embedding(ctx):
     """Uploads embeddings from .parquet file."""
@@ -9,7 +9,7 @@ def upload_embedding(ctx):
     click.echo("Not implemented.")
 
 
-@click.command("upload-documents")
+@click.command("upload-documents", help="Not Implemented.")
 @click.pass_obj
 def upload_documents(ctx):
     """Upload embeddings from .jsonl file."""

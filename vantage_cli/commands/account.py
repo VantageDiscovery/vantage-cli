@@ -35,12 +35,6 @@ def get_account(ctx):
 def update_account(ctx, name):
     """
     Updates details of a vantage account.
-
-    usage:
-        update-account <name>
-
-    arguments:
-        name: Vantage account name.
     """
     client = ctx["client"]
     printer = ctx["printer"]

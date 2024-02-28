@@ -26,16 +26,42 @@ def list_collections(ctx):
     )
 
 
-@click.command("create-collection")
-@click.option("--collection-id", type=click.STRING)
-@click.option("--collection-name", type=click.STRING)
-@click.option("--embedding-dimension", type=click.INT)
-@click.option("--llm-provider", type=click.STRING, required=False)
-@click.option("--external-key-id", type=click.STRING, required=False)
+@click.command("create-collection", help="Not Implemented.")
 @click.option(
-    "--collection-preview-url-pattern", type=click.STRING, required=False
+    "--collection-id", type=click.STRING, help="ID for the new collection."
 )
-@click.option("--embeddings", type=click.STRING, required=False)
+@click.option(
+    "--collection-name", type=click.STRING, help="Name for the new collection."
+)
+@click.option(
+    "--embedding-dimension",
+    type=click.INT,
+    help="Collecion embedding dimension",
+)
+@click.option(
+    "--llm-provider",
+    type=click.STRING,
+    required=False,
+    help="LLM provider ID (\"OpenAPI\"|\"Hugging\")",
+)
+@click.option(
+    "--external-key-id",
+    type=click.STRING,
+    required=False,
+    help="Key for the external API",
+)
+@click.option(
+    "--collection-preview-url-pattern",
+    type=click.STRING,
+    required=False,
+    help="???",
+)
+@click.option(
+    "--embeddings",
+    type=click.STRING,
+    required=False,
+    help="Path to Parquet file containing embeddings",
+)
 @click.pass_obj
 def create_collection(
     ctx,
@@ -47,21 +73,7 @@ def create_collection(
     collection_preview_url_pattern,
     embeddings,
 ):
-    """
-    Creates a new collection.
-
-    usage:
-        create-collection [OPTIONS]
-
-    options:
-        --collection-id                  : ID for the new collection.
-        --collection-name                : Name for the new collection.
-        --embedding-dimension            : Collecion embedding dimension
-        --llm-provider                   : LLM provider ID ("OpenAPI"|"Hugging")
-        --external-key-id                : Key for the external API
-        --collection-preview-url-pattern : ???
-        --embeddings                     : Path to Parquet file containing embeddings
-    """
+    """Creates a new collection."""
     click.echo("Not implemented.")
     # client: VantageClient = ctx["client"]
     # printer: Printer = ctx["printer"]
@@ -92,21 +104,21 @@ def create_collection(
     # )
 
 
-@click.command("get-collection")
+@click.command("get-collection", help="Not Implemented.")
 @click.pass_obj
 def get_collection(ctx):
     """Fetches collection details."""
     click.echo("Not implemented.")
 
 
-@click.command("update-collection")
+@click.command("update-collection", help="Not Implemented.")
 @click.pass_obj
 def update_collection(ctx):
     """Updates a collection."""
-    click.echo("Not implemented.")
+    click.echo("Not implemented.", help="Not Implemented.")
 
 
-@click.command("delete-collection")
+@click.command("delete-collection", help="Not Implemented.")
 @click.pass_obj
 def delete_collection(ctx):
     """Deletes a collection."""
