@@ -174,8 +174,8 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
         --llm-secret   : Secret key used to access LLM provider's API
         --url          : Currently not used.
     """
-    client: Vantageclient: VantageClient = ctx["client"]
-    printer: printer: Printer = ctx["printer"]
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
 
     try:
         content = client.update_external_api_key(
@@ -212,8 +212,8 @@ def delete_external_api_key(ctx, key_id):
     arguments:
         id             : External API key ID.
     """
-    client: Vantageclient: VantageClient = ctx["client"]
-    printer: printer: Printer = ctx["printer"]
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
 
     try:
         content = client.delete_external_api_key(
