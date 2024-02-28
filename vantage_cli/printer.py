@@ -10,6 +10,7 @@ class ContentType(Enum):
     OBJECT = "object"
     DICT = "dict"
     LIST = "list"
+    PLAINTEXT = "plaintext"
 
 
 class OutputType(Enum):
@@ -30,10 +31,10 @@ class Printer:
     def __init__(self, output_type: OutputType):
         self.output_type = output_type
 
-    def _print_json(self, content: dict[str, Any]) -> str:
+    def _to_json(self, content: dict[str, Any]) -> str:
         return jsonpickle.dumps(content, indent=2, unpicklable=False)
 
-    def _print_csv(self, content: list[Any] | dict[str, Any]) -> str:
+    def _to_csv(self, content: list[Any] | dict[str, Any]) -> str:
         data = StringIO()
         doc = csv.writer(data, lineterminator='\n')
 
@@ -48,18 +49,15 @@ class Printer:
 
         return data.getvalue()
 
-    def _print_plaintext(self, content: list[Any] | dict[str, Any]) -> str:
-        pass
-
     def parse(self, printable: Printable) -> str:
         if printable is None or printable.content is None:
             return ""
         if self.output_type == OutputType.JSON:
-            return self._print_json(printable.content)
+            return self._to_json(printable.content)
         elif self.output_type == OutputType.CSV:
-            return self._print_csv(printable.content)
+            return self._to_csv(printable.content)
         elif self.output_type == OutputType.PLAINTEXT:
-            return self._print_plaintext(printable.content)
+            return printable.content
 
     def print(self, content) -> None:
         click.echo(self.parse(content))

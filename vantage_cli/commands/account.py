@@ -1,5 +1,7 @@
 import click
 from printer import Printable, ContentType
+from vantage_cli.util import get_generic_message_for_exception
+from vantage.exceptions import VantageNotFoundError
 
 
 @click.command("get-account")
@@ -9,26 +11,52 @@ def get_account(ctx):
     client = ctx["client"]
     printer = ctx["printer"]
 
-    response = Printable(
-        content=client.get_account().__dict__,
-        content_type=ContentType.OBJECT,
+    content_type = ContentType.OBJECT
+    try:
+        content = client.get_account().__dict__
+    except Exception as exception:
+        if isinstance(exception, VantageNotFoundError):
+            content = "User not found."
+        else:
+            content = get_generic_message_for_exception(exception)
+        content_type = ContentType.PLAINTEXT
+
+    printer.print(
+        Printable(
+            content=content,
+            content_type=content_type,
+        )
     )
-    printer.print(response)
 
 
 @click.command("update-account")
 @click.argument("name", type=click.STRING)
 @click.pass_obj
 def update_account(ctx, name):
-    """Updates details of a vantage account.
+    """
+    Updates details of a vantage account.
 
-    name: Vantage account name.
+    usage:
+        update-account <name>
+
+    arguments:
+        name: Vantage account name.
     """
     client = ctx["client"]
     printer = ctx["printer"]
 
-    response = Printable(
-        client.update_account(account_name=name).__dict__,
-        content_type=ContentType.OBJECT,
+    try:
+        content = client.update_account(account_name=name).__dict__
+    except Exception as exception:
+        if isinstance(exception, VantageNotFoundError):
+            content = "User not found."
+        else:
+            content = get_generic_message_for_exception(exception)
+        content_type = ContentType.PLAINTEXT
+
+    printer.print(
+        Printable(
+            content=content,
+            content_type=content_type,
+        )
     )
-    printer.print(response)
