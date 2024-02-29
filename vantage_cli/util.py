@@ -1,6 +1,9 @@
 from vantage import VantageClient
 from printer import Printer, Printable, OutputType
 from typing import Callable, Any
+from vantage.model.search import MoreLikeThese
+import jsonpickle
+
 from vantage.exceptions import (
     VantageForbiddenError,
     VantageInvalidRequestError,
@@ -40,3 +43,12 @@ def get_generic_message_for_exception(exception: Exception) -> str:
         return EXCEPTION_MESSAGES[type(exception)]
     else:
         return exception.message
+
+
+def parse_more_like_these(json_string: str) -> list[MoreLikeThese]:
+    data = jsonpickle.loads(json_string)
+
+    return [
+        MoreLikeThese(weight=item["weight"], query_text=item["text"])
+        for item in data
+    ]
