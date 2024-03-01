@@ -12,6 +12,7 @@ def get_vantage_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = [item.__dict__ for item in client.get_vantage_api_keys()]
     except Exception as exception:
@@ -34,6 +35,7 @@ def get_vantage_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.get_vantage_api_key(
             vantage_api_key_id=key_id
@@ -73,6 +75,7 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.create_external_api_key(
             llm_provider=llm_provider,
@@ -98,6 +101,7 @@ def get_external_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = [item.__dict__ for item in client.get_external_api_keys()]
     except Exception as exception:
@@ -120,6 +124,7 @@ def get_external_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.get_external_api_key(external_key_id=key_id).__dict__
     except Exception as exception:
@@ -158,6 +163,7 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.update_external_api_key(
             external_key_id=key_id,
@@ -188,6 +194,7 @@ def delete_external_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.delete_external_api_key(
             external_key_id=key_id

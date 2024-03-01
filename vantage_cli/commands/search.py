@@ -62,6 +62,7 @@ def embedding_search(
     """Search using provided embeddings."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         content = [
@@ -144,6 +145,7 @@ def semantic_search(
     """Search using text."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         content = [
@@ -233,6 +235,7 @@ def more_like_this_search(
     """Finds more like this."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         content = [
@@ -328,6 +331,7 @@ def more_like_these_search(
     """Finds more like these."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         more_like_these = parse_more_like_these(more_like_these)

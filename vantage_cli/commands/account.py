@@ -33,12 +33,11 @@ def get_account(ctx):
 @click.argument("name", type=click.STRING)
 @click.pass_obj
 def update_account(ctx, name):
-    """
-    Updates details of a vantage account.
-    """
+    """Updates details of a vantage account."""
     client = ctx["client"]
     printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.update_account(account_name=name).__dict__
     except Exception as exception:

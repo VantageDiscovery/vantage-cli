@@ -11,6 +11,7 @@ def list_collections(ctx):
     """Lists existing colections."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         content = [item.__dict__ for item in client.list_collections()]
@@ -77,6 +78,7 @@ def create_collection(
     """Creates a new collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     if llm_provider is None or external_key_id is None:
         llm_provider = None
@@ -112,6 +114,7 @@ def get_collection(ctx, collection_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
+    content_type = ContentType.OBJECT
     try:
         content = client.get_collection(collection_id=collection_id)
     except Exception as exception:
@@ -162,6 +165,7 @@ def update_collection(
     """Updates collection data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         client.update(
@@ -192,6 +196,7 @@ def delete_collection(ctx, collection_id):
     """Deletes a collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    content_type = ContentType.OBJECT
 
     try:
         content = client.delete_collection(collection_id=collection_id)
