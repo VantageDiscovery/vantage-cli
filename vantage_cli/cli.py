@@ -29,6 +29,7 @@ from commands.search import (
 )
 from vantage_cli.printer import create_printer
 from vantage import VantageClient
+from vantage_cli.commands.util import CommandExecutor
 
 DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
@@ -42,6 +43,10 @@ def create_client(jwt_token: str, account_id: str):
     )
 
 
+def create_executor(debug: bool):
+    return CommandExecutor(debug_exceptions=debug)
+
+
 @click.group()
 @click.option(
     "-a",
@@ -49,6 +54,15 @@ def create_client(jwt_token: str, account_id: str):
     envvar="VANTAGE_ACCOUNT_ID",
     type=click.STRING,
     default=None,
+    help="Vantage account ID",
+)
+@click.option(
+    "-d",
+    "--debug-errors",
+    envvar="VANTAGE_ACCOUNT_ID",
+    type=click.BOOL,
+    default=False,
+    help="Print debug info for errors returned by API.",
 )
 @click.option(
     "-t",
@@ -56,17 +70,23 @@ def create_client(jwt_token: str, account_id: str):
     envvar="VANTAGE_API_JWT_TOKEN",
     type=click.STRING,
     default=None,
+    help="JWT token for accessing API.",
 )
 @click.option(
-    "-o", "--output-type", type=click.Choice(["json", "csv"]), default="json"
+    "-o",
+    "--output-type",
+    type=click.Choice(["json", "csv"]),
+    default="json",
+    help="Command execution result print format.",
 )
 @click.pass_context
-def cli(ctx, account_id, jwt_token, output_type):
+def cli(ctx, account_id, jwt_token, output_type, debug_errors):
     ctx.ensure_object(dict)
     ctx.obj["client"] = create_client(
         jwt_token=jwt_token, account_id=account_id
     )
     ctx.obj["printer"] = create_printer(output_type=output_type)
+    ctx.obj["executor"] = create_executor(debug=debug_errors)
 
 
 cli.add_command(get_account)

@@ -1,7 +1,7 @@
 import click
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
-from commands.util import execute_and_print_output, specific_exception_handler
+from vantage_cli.commands.util import specific_exception_handler
 from printer import Printer, ContentType
 
 
@@ -11,8 +11,9 @@ def list_collections(ctx):
     """Lists existing colections."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: [item.__dict__ for item in client.list_collections()],
         output_type=ContentType.OBJECT,
         printer=printer,
@@ -77,12 +78,13 @@ def create_collection(
     """Creates a new collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
     if llm_provider is None or external_key_id is None:
         llm_provider = None
         external_key_id = None
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.create_collection(
             collection_id=collection_id,
             collection_name=collection_name,
@@ -108,8 +110,9 @@ def get_collection(ctx, collection_id):
     """Fetches collection details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         lambda: client.get_collection(collection_id=collection_id).__dict__,
         ContentType.OBJECT,
         printer=printer,
@@ -157,8 +160,9 @@ def update_collection(
     """Updates collection data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         lambda: client.update_collection(
             collection_id=collection_id,
             collection_name=collection_name,
@@ -186,8 +190,9 @@ def delete_collection(ctx, collection_id):
     """Deletes a collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         lambda: client.delete_collection(collection_id=collection_id).__dict__,
         ContentType.OBJECT,
         printer=printer,

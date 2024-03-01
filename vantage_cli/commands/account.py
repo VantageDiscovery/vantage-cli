@@ -1,7 +1,7 @@
 import click
 from printer import ContentType
 from vantage.exceptions import VantageNotFoundError
-from commands.util import execute_and_print_output, specific_exception_handler
+from vantage_cli.commands.util import specific_exception_handler
 
 
 @click.command("get-account")
@@ -10,8 +10,9 @@ def get_account(ctx):
     """Fetches Vantage account details."""
     client = ctx["client"]
     printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.get_account().__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
@@ -29,8 +30,9 @@ def update_account(ctx, name):
     """Updates details of a vantage account."""
     client = ctx["client"]
     printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.update_account(account_name=name).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,

@@ -2,7 +2,7 @@ import click
 from printer import ContentType, Printer
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
-from commands.util import execute_and_print_output, specific_exception_handler
+from vantage_cli.commands.util import specific_exception_handler
 
 
 @click.command("get-vantage-api-keys")
@@ -11,8 +11,9 @@ def get_vantage_api_keys(ctx):
     """Lists existing Vantage API keys."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: [
             item.__dict__ for item in client.get_vantage_api_keys()
         ],
@@ -32,8 +33,9 @@ def get_vantage_api_key(ctx, key_id):
     """Shows a specific Vantage API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.get_vantage_api_key(
             vantage_api_key_id=key_id
         ).__dict__,

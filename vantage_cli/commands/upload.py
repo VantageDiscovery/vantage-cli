@@ -1,8 +1,38 @@
 import click
-from vantage_cli.commands.util import get_generic_message_for_exception
 from vantage import VantageClient
-from vantage.exceptions import VantageNotFoundError
-from printer import Printer
+from printer import Printer, ContentType
+
+
+def _upload_parquet(
+    client, collection_id, batch_identifier, parquet_file
+) -> str:
+    response = client.upload_embedding_by_path(
+        collection_id=collection_id,
+        file_path=parquet_file,
+        customer_batch_identifier=batch_identifier,
+    )
+    if response == 200:
+        content = "Uploaded successfully."
+    else:
+        content = f"Upload failed with status {response}"
+
+    return content
+
+
+def _upload_documents(
+    client, collection_id, batch_identifier, documents_file
+) -> str:
+    response = client.upload_embedding_by_path(
+        collection_id=collection_id,
+        file_path=documents_file,
+        customer_batch_identifier=batch_identifier,
+    )
+    if response == 200:
+        content = "Uploaded successfully."
+    else:
+        content = f"Upload failed with status {response}"
+
+    return content
 
 
 @click.command("upload-parquet")
@@ -29,25 +59,19 @@ def upload_parquet(ctx, collection_id, batch_identifier, parquet_file):
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
     printer.print_text(text="Uploading...")
 
-    try:
-        response = client.upload_embedding_by_path(
+    executor.execute_and_print_output(
+        command=lambda: _upload_parquet(
+            client=client,
             collection_id=collection_id,
-            file_path=parquet_file,
-            customer_batch_identifier=batch_identifier,
-        )
-        if response == 200:
-            content = "Uploaded successfully."
-        else:
-            content = f"Upload failed with status {response}"
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-
-    printer.print_text(text=content)
+            batch_identifier=batch_identifier,
+            parquet_file=parquet_file,
+        ),
+        output_type=ContentType.PLAINTEXT,
+        printer=printer,
+    )
 
 
 @click.command("upload-documents")
@@ -74,22 +98,16 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
     printer.print_text(text="Uploading...")
 
-    try:
-        response = client.upload_embedding_by_path(
+    executor.execute_and_print_output(
+        command=lambda: _upload_documents(
+            client=client,
             collection_id=collection_id,
-            file_path=documents_file,
-            customer_batch_identifier=batch_identifier,
-        )
-        if response == 200:
-            content = "Uploaded successfully."
-        else:
-            content = f"Upload failed with status {response}"
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-
-    printer.print_text(text=content)
+            batch_identifier=batch_identifier,
+            documents_file=documents_file,
+        ),
+        output_type=ContentType.PLAINTEXT,
+        printer=printer,
+    )

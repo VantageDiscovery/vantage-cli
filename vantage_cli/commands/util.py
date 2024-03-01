@@ -1,5 +1,6 @@
 from typing import Callable, Optional, Type
 from printer import Printable, ContentType, Printer
+import traceback
 from vantage.exceptions import (
     VantageForbiddenError,
     VantageInvalidRequestError,
@@ -11,46 +12,53 @@ from vantage.exceptions import (
 from vantage.model.search import MoreLikeThese
 import jsonpickle
 
-EXCEPTION_MESSAGES = {
-    VantageInvalidRequestError: "Invalid request sent.",
-    VantageForbiddenError: "Access denied. You are not authorized to perform this action.",
-    VantageInvalidResponseError: "Service error, server returned erroneous response.",
-    VantageNotFoundError: "Resource not found.",
-    VantageUnauthorizedError: "Unauthorized. Check your credentials.",
-    VantageServiceError: "Unknown error ocurred.",
-}
 
+class CommandExecutor:
+    EXCEPTION_MESSAGES = {
+        VantageInvalidRequestError: "Invalid request sent.",
+        VantageForbiddenError: "Access denied. You are not authorized to perform this action.",
+        VantageInvalidResponseError: "Service error, server returned erroneous response.",
+        VantageNotFoundError: "Resource not found.",
+        VantageUnauthorizedError: "Unauthorized. Check your credentials.",
+        VantageServiceError: "Unknown error ocurred.",
+    }
 
-def get_generic_message_for_exception(exception: Exception) -> str:
-    if type(exception) in EXCEPTION_MESSAGES:
-        return EXCEPTION_MESSAGES[type(exception)]
-    else:
-        return exception
+    def __init__(self, debug_exceptions: bool = False):
+        self.debug_exceptions = debug_exceptions
 
+    def get_generic_message_for_exception(self, exception: Exception) -> str:
+        if type(exception) in self.EXCEPTION_MESSAGES:
+            return self.EXCEPTION_MESSAGES[type(exception)]
+        else:
+            return exception
 
-def execute_and_print_output(
-    command: Callable,
-    output_type: ContentType,
-    printer: Printer,
-    exception_handler: Optional[Callable] = None,
-) -> None:
-    printable = None
+    def execute_and_print_output(
+        self,
+        command: Callable,
+        output_type: ContentType,
+        printer: Printer,
+        exception_handler: Optional[Callable] = None,
+    ) -> None:
+        printable = None
 
-    try:
-        printable = Printable(
-            content=command(),
-            content_type=output_type,
-        )
-    except Exception as exception:
-        print(exception)
-        if exception_handler:
-            printable = exception_handler(exception)
-        if not printable:
+        try:
             printable = Printable(
-                content=get_generic_message_for_exception(exception),
-                content_type=ContentType.PLAINTEXT,
+                content=command(),
+                content_type=output_type,
             )
-    printer.print(printable)
+        except Exception as exception:
+            if self.debug_exceptions:
+                print(traceback.format_exc())
+                return
+
+            if exception_handler:
+                printable = exception_handler(exception)
+            if not printable:
+                printable = Printable(
+                    content=self.get_generic_message_for_exception(exception),
+                    content_type=ContentType.PLAINTEXT,
+                )
+        printer.print(printable)
 
 
 def specific_exception_handler(
