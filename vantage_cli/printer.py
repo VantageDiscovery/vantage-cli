@@ -61,3 +61,7 @@ class Printer:
 
     def print(self, content) -> None:
         click.echo(self.parse(content))
+
+
+def create_printer(output_type: str):
+    return Printer(output_type=OutputType[output_type.upper()])

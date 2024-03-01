@@ -1,8 +1,8 @@
 import click
-from vantage_cli.util import get_generic_message_for_exception
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
-from printer import Printer, Printable, ContentType
+from commands.util import execute_and_print_output, specific_exception_handler
+from printer import Printer, ContentType
 
 
 @click.command("list-collections")
@@ -11,19 +11,11 @@ def list_collections(ctx):
     """Lists existing colections."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        content = [item.__dict__ for item in client.list_collections()]
-    except Exception as exception:
-        content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: [item.__dict__ for item in client.list_collections()],
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -85,14 +77,13 @@ def create_collection(
     """Creates a new collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
     if llm_provider is None or external_key_id is None:
         llm_provider = None
         external_key_id = None
 
-    try:
-        content = client.create_collection(
+    execute_and_print_output(
+        command=lambda: client.create_collection(
             collection_id=collection_id,
             collection_name=collection_name,
             embeddings_dimension=embeddings_dimension,
@@ -100,16 +91,9 @@ def create_collection(
             llm=llm_provider,
             external_key_id=external_key_id,
             collection_preview_url_pattern=collection_preview_url_pattern,
-        )
-    except Exception as exception:
-        content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ),
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -125,21 +109,15 @@ def get_collection(ctx, collection_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.get_collection(collection_id=collection_id)
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        lambda: client.get_collection(collection_id=collection_id).__dict__,
+        ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )
 
 
@@ -179,27 +157,21 @@ def update_collection(
     """Updates collection data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        client.update(
+    execute_and_print_output(
+        lambda: client.update_collection(
             collection_id=collection_id,
             collection_name=collection_name,
             external_key_id=external_key_id,
             collection_preview_url_pattern=collection_preview_url_pattern,
-        )
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ).__dict__,
+        ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )
 
 
@@ -214,20 +186,14 @@ def delete_collection(ctx, collection_id):
     """Deletes a collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        content = client.delete_collection(collection_id=collection_id)
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        lambda: client.delete_collection(collection_id=collection_id).__dict__,
+        ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )

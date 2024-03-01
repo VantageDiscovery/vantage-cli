@@ -1,11 +1,9 @@
 import click
-from vantage_cli.util import (
-    get_generic_message_for_exception,
-    parse_more_like_these,
-)
+from vantage_cli.util import parse_more_like_these
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
 from printer import Printer, Printable, ContentType
+from commands.util import execute_and_print_output, specific_exception_handler
 
 
 @click.command("embedding-search")
@@ -65,10 +63,9 @@ def embedding_search(
     """Search using provided embeddings."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        content = [
+    execute_and_print_output(
+        command=lambda: [
             item.__dict__
             for item in client.embedding_search(
                 embedding=embedding,
@@ -79,19 +76,14 @@ def embedding_search(
                 boolean_filter=boolean_filter,
                 vantage_api_key=vantage_api_key,
             ).results
-        ]
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )
 
 
@@ -151,10 +143,9 @@ def semantic_search(
     """Search using text."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        content = [
+    execute_and_print_output(
+        command=lambda: [
             item.__dict__
             for item in client.embedding_search(
                 text=text,
@@ -165,19 +156,14 @@ def semantic_search(
                 boolean_filter=boolean_filter,
                 vantage_api_key=vantage_api_key,
             ).results
-        ]
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )
 
 
@@ -245,10 +231,9 @@ def more_like_this_search(
     """Finds more like this."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
-    try:
-        content = [
+    execute_and_print_output(
+        command=lambda: [
             item.__dict__
             for item in client.more_like_this_search(
                 accuracy=accuracy,
@@ -260,19 +245,14 @@ def more_like_this_search(
                 boolean_filter=boolean_filter,
                 vantage_api_key=vantage_api_key,
             ).results
-        ]
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )
 
 
@@ -346,7 +326,6 @@ def more_like_these_search(
     """Finds more like these."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.OBJECT
 
     try:
         more_like_these = parse_more_like_these(more_like_these)
@@ -359,8 +338,8 @@ def more_like_these_search(
         )
         return
 
-    try:
-        content = [
+    execute_and_print_output(
+        command=lambda: [
             item.__dict__
             for item in client.more_like_these_search(
                 accuracy=accuracy,
@@ -373,17 +352,12 @@ def more_like_these_search(
                 vantage_api_key=vantage_api_key,
                 more_like_these=more_like_these,
             ).results
-        ]
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
     )

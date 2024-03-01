@@ -27,7 +27,19 @@ from commands.search import (
     more_like_this_search,
     semantic_search,
 )
-from vantage_cli.util import create_client, create_printer
+from vantage_cli.printer import create_printer
+from vantage import VantageClient
+
+DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
+DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
+
+
+def create_client(jwt_token: str, account_id: str):
+    return VantageClient.using_jwt_token(
+        vantage_api_jwt_token=jwt_token,
+        api_host=DEFAULT_API_HOST,
+        account_id=account_id,
+    )
 
 
 @click.group()

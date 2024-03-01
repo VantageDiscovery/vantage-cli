@@ -1,8 +1,8 @@
 import click
-from printer import Printer, Printable, ContentType
+from printer import ContentType, Printer
 from vantage import VantageClient
-from vantage_cli.util import get_generic_message_for_exception
 from vantage.exceptions import VantageNotFoundError
+from commands.util import execute_and_print_output, specific_exception_handler
 
 
 @click.command("get-vantage-api-keys")
@@ -12,18 +12,12 @@ def get_vantage_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = [item.__dict__ for item in client.get_vantage_api_keys()]
-    except Exception as exception:
-        content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: [
+            item.__dict__ for item in client.get_vantage_api_keys()
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -39,23 +33,17 @@ def get_vantage_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.get_vantage_api_key(
+    execute_and_print_output(
+        command=lambda: client.get_vantage_api_key(
             vantage_api_key_id=key_id
-        ).__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "Collection not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Vantage API key not found.",
+        ),
     )
 
 
@@ -81,22 +69,14 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.create_external_api_key(
+    execute_and_print_output(
+        command=lambda: client.create_external_api_key(
             llm_provider=llm_provider,
             llm_secret=llm_secret,
             url=url,
-        ).__dict__
-    except Exception as exception:
-        content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -107,18 +87,12 @@ def get_external_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = [item.__dict__ for item in client.get_external_api_keys()]
-    except Exception as exception:
-        content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: [
+            item.__dict__ for item in client.get_external_api_keys()
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -134,21 +108,17 @@ def get_external_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.get_external_api_key(external_key_id=key_id).__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "External API key not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: client.get_external_api_key(
+            external_key_id=key_id
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="External API key not found.",
+        ),
     )
 
 
@@ -175,26 +145,20 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.update_external_api_key(
+    execute_and_print_output(
+        command=lambda: client.update_external_api_key(
             external_key_id=key_id,
             url=url,
             llm_provider=llm_provider,
             llm_secret=llm_secret,
-        ).__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "External API key not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="External API key not found.",
+        ),
     )
 
 
@@ -210,21 +174,15 @@ def delete_external_api_key(ctx, key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.delete_external_api_key(
+    execute_and_print_output(
+        command=lambda: client.delete_external_api_key(
             external_key_id=key_id
-        ).__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "External API key not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="External API key not found.",
+        ),
     )

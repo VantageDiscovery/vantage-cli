@@ -1,7 +1,7 @@
 import click
-from printer import Printable, ContentType
-from vantage_cli.util import get_generic_message_for_exception
+from printer import ContentType
 from vantage.exceptions import VantageNotFoundError
+from commands.util import execute_and_print_output, specific_exception_handler
 
 
 @click.command("get-account")
@@ -11,21 +11,10 @@ def get_account(ctx):
     client = ctx["client"]
     printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.get_account().__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "User not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: client.get_account().__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
 
 
@@ -41,19 +30,13 @@ def update_account(ctx, name):
     client = ctx["client"]
     printer = ctx["printer"]
 
-    content_type = ContentType.OBJECT
-    try:
-        content = client.update_account(account_name=name).__dict__
-    except Exception as exception:
-        if isinstance(exception, VantageNotFoundError):
-            content = "User not found."
-        else:
-            content = get_generic_message_for_exception(exception)
-        content_type = ContentType.PLAINTEXT
-
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
+    execute_and_print_output(
+        command=lambda: client.update_account(account_name=name).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Account not found.",
+        ),
     )
