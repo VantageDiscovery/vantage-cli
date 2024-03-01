@@ -1,5 +1,5 @@
 import click
-from vantage_cli.util import parse_more_like_these
+from vantage_cli.commands.util import parse_more_like_these
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
 from printer import Printer, Printable, ContentType

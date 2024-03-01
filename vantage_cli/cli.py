@@ -3,8 +3,8 @@
 """Console script for vantage_cli."""
 
 import click
-from commands.account import get_account, update_account
-from commands.api_keys import (
+from vantage_cli.commands.account import get_account, update_account
+from vantage_cli.commands.api_keys import (
     get_vantage_api_key,
     get_vantage_api_keys,
     create_external_api_key,
