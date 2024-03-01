@@ -9,15 +9,18 @@ from printer import Printer, Printable, ContentType
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--batch-identifier",
     type=click.STRING,
+    required=True,
     help="Customer batch identifier.",
 )
 @click.option(
     "parquet-file",
+    required=True,
     type=click.STRING,
 )
 @click.pass_obj
@@ -56,16 +59,19 @@ def upload_embedding(ctx, collection_id, batch_identifier, parquet_file):
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--batch-identifier",
     type=click.STRING,
+    required=True,
     help="Customer batch identifier.",
 )
-@click.option(
+@click.argument(
     "documents-file",
     type=click.STRING,
+    required=True,
 )
 @click.pass_obj
 def upload_documents(ctx, collection_id, documents_file, batch_identifier):

@@ -29,14 +29,21 @@ def list_collections(ctx):
 
 @click.command("create-collection")
 @click.option(
-    "--collection-id", type=click.STRING, help="ID for the new collection."
+    "--collection-id",
+    type=click.STRING,
+    help="ID for the new collection.",
+    required=True,
 )
 @click.option(
-    "--collection-name", type=click.STRING, help="Name for the new collection."
+    "--collection-name",
+    type=click.STRING,
+    required=True,
+    help="Name for the new collection.",
 )
 @click.option(
-    "--embedding-dimension",
+    "--embeddings-dimension",
     type=click.INT,
+    required=True,
     help="Collecion embedding dimension",
 )
 @click.option(
@@ -107,7 +114,11 @@ def create_collection(
 
 
 @click.command("get-collection")
-@click.argument("collection_id", type=click.STRING)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def get_collection(ctx, collection_id):
     """Fetches collection details."""
@@ -134,13 +145,16 @@ def get_collection(ctx, collection_id):
 
 @click.command("update-collection")
 @click.option(
-    "--collection-id", type=click.STRING, help="ID for the new collection."
+    "--collection-id",
+    type=click.STRING,
+    required=True,
+    help="ID for the new collection.",
 )
 @click.option(
     "--collection-name",
     type=click.STRING,
-    help="Name for the new collection.",
     required=False,
+    help="Name for the new collection.",
 )
 @click.option(
     "--external-key-id",
@@ -190,7 +204,11 @@ def update_collection(
 
 
 @click.command("delete-collection")
-@click.argument("collection_id", type=click.STRING)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def delete_collection(ctx, collection_id):
     """Deletes a collection."""

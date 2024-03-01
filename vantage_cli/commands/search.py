@@ -12,16 +12,19 @@ from printer import Printer, Printable, ContentType
 @click.option(
     "--embedding",
     type=click.STRING,
+    required=True,
     help="Embedding used for searching the collection.",
 )
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--vantage-api-key",
     type=click.STRING,
+    required=True,
     help="Vantage API key used for search.",
 )
 @click.option(
@@ -33,20 +36,20 @@ from printer import Printer, Printable, ContentType
 @click.option(
     "--page",
     type=click.INT,
-    help="Search page.",
     required=False,
+    help="Search page.",
 )
 @click.option(
     "--items-per-page",
     type=click.INT,
-    help="Items returned per search page.",
     required=False,
+    help="Items returned per search page.",
 )
 @click.option(
     "--boolean-filter",
     type=click.STRING,
-    help="Search filter.",
     required=False,
+    help="Search filter.",
 )
 @click.pass_obj
 def embedding_search(
@@ -96,40 +99,43 @@ def embedding_search(
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--vantage-api-key",
     type=click.STRING,
+    required=True,
     help="Vantage API key used for search.",
 )
 @click.option(
     "--accuracy",
     type=click.FLOAT,
-    help="Search accuracy.",
     required=False,
+    help="Search accuracy.",
 )
 @click.option(
     "--page",
     type=click.INT,
-    help="Search page.",
     required=False,
+    help="Search page.",
 )
 @click.option(
     "--items-per-page",
     type=click.INT,
-    help="Items returned per search page.",
     required=False,
+    help="Items returned per search page.",
 )
 @click.option(
     "--boolean-filter",
     type=click.STRING,
-    help="Search filter.",
     required=False,
+    help="Search filter.",
 )
 @click.argument(
     "text",
     type=click.STRING,
+    required=True,
 )
 @click.pass_obj
 def semantic_search(
@@ -179,46 +185,50 @@ def semantic_search(
 @click.option(
     "--document_id",
     type=click.STRING,
+    required=True,
     help="ID of a document in a collection.",
 )
 @click.option(
     "--request_id",
     type=click.STRING,
+    required=True,
     help="Request ID.",
 )
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--vantage-api-key",
     type=click.STRING,
+    required=True,
     help="Vantage API key used for search.",
 )
 @click.option(
     "--accuracy",
     type=click.FLOAT,
-    help="Search accuracy.",
     required=False,
+    help="Search accuracy.",
 )
 @click.option(
     "--page",
     type=click.INT,
-    help="Search page.",
     required=False,
+    help="Search page.",
 )
 @click.option(
     "--items-per-page",
     type=click.INT,
-    help="Items returned per search page.",
     required=False,
+    help="Items returned per search page.",
 )
 @click.option(
     "--boolean-filter",
     type=click.STRING,
-    help="Search filter.",
     required=False,
+    help="Search filter.",
 )
 @click.pass_obj
 def more_like_this_search(
@@ -270,50 +280,55 @@ def more_like_this_search(
 @click.option(
     "--document_id",
     type=click.STRING,
+    required=True,
     help="ID of a document in a collection.",
 )
 @click.option(
     "--request_id",
     type=click.STRING,
+    required=True,
     help="Request ID.",
 )
 @click.option(
     "--collection_id",
     type=click.STRING,
+    required=True,
     help="Collection ID.",
 )
 @click.option(
     "--vantage-api-key",
     type=click.STRING,
+    required=True,
     help="Vantage API key used for search.",
 )
 @click.option(
     "--accuracy",
     type=click.FLOAT,
-    help="Search accuracy.",
     required=False,
+    help="Search accuracy.",
 )
 @click.option(
     "--page",
     type=click.INT,
-    help="Search page.",
     required=False,
+    help="Search page.",
 )
 @click.option(
     "--items-per-page",
     type=click.INT,
-    help="Items returned per search page.",
     required=False,
+    help="Items returned per search page.",
 )
 @click.option(
     "--boolean-filter",
     type=click.STRING,
-    help="Search filter.",
     required=False,
+    help="Search filter.",
 )
 @click.argument(
     "more-like-these",
     type=click.STRING,
+    required=True,
 )
 @click.pass_obj
 def more_like_these_search(

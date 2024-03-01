@@ -30,7 +30,11 @@ def get_account(ctx):
 
 
 @click.command("update-account")
-@click.argument("name", type=click.STRING)
+@click.argument(
+    "name",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def update_account(ctx, name):
     """Updates details of a vantage account."""

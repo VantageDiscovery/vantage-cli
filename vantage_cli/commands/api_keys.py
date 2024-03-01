@@ -28,7 +28,11 @@ def get_vantage_api_keys(ctx):
 
 
 @click.command("get-vantage-api-key")
-@click.argument("key_id", type=click.STRING)
+@click.argument(
+    "key_id",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def get_vantage_api_key(ctx, key_id):
     """Shows a specific Vantage API key details."""
@@ -59,11 +63,13 @@ def get_vantage_api_key(ctx, key_id):
 @click.option(
     "--llm-provider",
     type=click.STRING,
+    required=True,
     help="LLM provider ID supported by Vantage. Currently either \"OpenAPI\" or \"Hugging\".",
 )
 @click.option(
     "--llm-secret",
     type=click.STRING,
+    required=True,
     help="Secret key used to access LLM provider's API",
 )
 @click.option(
@@ -117,7 +123,11 @@ def get_external_api_keys(ctx):
 
 
 @click.command("get-external-api-key")
-@click.argument("key_id", type=click.STRING)
+@click.argument(
+    "key_id",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def get_external_api_key(ctx, key_id):
     """Shows a specific external API key details."""
@@ -146,17 +156,19 @@ def get_external_api_key(ctx, key_id):
 @click.option(
     "--llm-provider",
     type=click.STRING,
+    required=True,
     help="LLM provider ID supported by Vantage. Currently either \"OpenAPI\" or \"Hugging\".",
 )
 @click.option(
     "--llm-secret",
     type=click.STRING,
+    required=True,
     help="Secret key used to access LLM provider's API",
 )
 @click.option(
     "--url", type=click.STRING, required=False, help="Currently not used"
 )
-@click.argument("key_id", type=click.STRING)
+@click.argument("key_id", type=click.STRING, required=True)
 @click.pass_obj
 def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
     """Updates external API key data."""
@@ -187,7 +199,11 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
 
 
 @click.command("delete-external-api-key")
-@click.argument("key_id", type=click.STRING)
+@click.argument(
+    "key_id",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def delete_external_api_key(ctx, key_id):
     """Deletes external API key."""
