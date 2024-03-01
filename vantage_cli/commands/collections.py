@@ -62,7 +62,7 @@ def list_collections(ctx):
     "--collection-preview-url-pattern",
     type=click.STRING,
     required=False,
-    help="???",
+    help="URL pattern for previewing items in the collection",
 )
 @click.option(
     "--use-provided-embeddings",
@@ -92,7 +92,7 @@ def create_collection(
         external_key_id = None
 
     try:
-        client.create_collection(
+        content = client.create_collection(
             collection_id=collection_id,
             collection_name=collection_name,
             embeddings_dimension=embeddings_dimension,
@@ -166,7 +166,7 @@ def get_collection(ctx, collection_id):
     "--collection-preview-url-pattern",
     type=click.STRING,
     required=False,
-    help="???",
+    help="URL pattern for previewing items in the collection",
 )
 @click.pass_obj
 def update_collection(
