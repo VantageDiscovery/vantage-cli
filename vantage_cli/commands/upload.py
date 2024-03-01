@@ -2,12 +2,12 @@ import click
 from vantage_cli.commands.util import get_generic_message_for_exception
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
-from printer import Printer, Printable, ContentType
+from printer import Printer
 
 
 @click.command("upload-parquet")
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
@@ -15,21 +15,21 @@ from printer import Printer, Printable, ContentType
 @click.option(
     "--batch-identifier",
     type=click.STRING,
-    required=True,
+    required=False,
     help="Customer batch identifier.",
 )
-@click.option(
+@click.argument(
     "parquet-file",
     required=True,
     type=click.STRING,
 )
 @click.pass_obj
-def upload_embedding(ctx, collection_id, batch_identifier, parquet_file):
+def upload_parquet(ctx, collection_id, batch_identifier, parquet_file):
     """Uploads embeddings from .parquet file."""
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.PLAINTEXT
+    printer.print_text(text="Uploading...")
 
     try:
         response = client.upload_embedding_by_path(
@@ -47,17 +47,12 @@ def upload_embedding(ctx, collection_id, batch_identifier, parquet_file):
         else:
             content = get_generic_message_for_exception(exception)
 
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
-    )
+    printer.print_text(text=content)
 
 
 @click.command("upload-documents")
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
@@ -65,7 +60,7 @@ def upload_embedding(ctx, collection_id, batch_identifier, parquet_file):
 @click.option(
     "--batch-identifier",
     type=click.STRING,
-    required=True,
+    required=False,
     help="Customer batch identifier.",
 )
 @click.argument(
@@ -79,7 +74,7 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    content_type = ContentType.PLAINTEXT
+    printer.print_text(text="Uploading...")
 
     try:
         response = client.upload_embedding_by_path(
@@ -97,9 +92,4 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
         else:
             content = get_generic_message_for_exception(exception)
 
-    printer.print(
-        Printable(
-            content=content,
-            content_type=content_type,
-        )
-    )
+    printer.print_text(text=content)

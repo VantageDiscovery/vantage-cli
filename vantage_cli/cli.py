@@ -20,7 +20,7 @@ from commands.collections import (
     list_collections,
     update_collection,
 )
-from commands.upload import upload_embedding, upload_documents
+from commands.upload import upload_parquet, upload_documents
 from commands.search import (
     embedding_search,
     more_like_these_search,
@@ -83,7 +83,7 @@ cli.add_command(delete_collection)
 cli.add_command(get_collection)
 cli.add_command(list_collections)
 cli.add_command(update_collection)
-cli.add_command(upload_embedding)
+cli.add_command(upload_parquet)
 cli.add_command(upload_documents)
 cli.add_command(embedding_search)
 cli.add_command(more_like_these_search)

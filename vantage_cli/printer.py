@@ -62,6 +62,9 @@ class Printer:
     def print(self, content) -> None:
         click.echo(self.parse(content))
 
+    def print_text(self, text) -> None:
+        self.print(Printable(content=text, content_type=ContentType.PLAINTEXT))
+
 
 def create_printer(output_type: str):
     return Printer(output_type=OutputType[output_type.upper()])

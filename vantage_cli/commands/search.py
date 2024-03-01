@@ -3,7 +3,10 @@ from vantage_cli.commands.util import parse_more_like_these
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
 from printer import Printer, Printable, ContentType
-from commands.util import execute_and_print_output, specific_exception_handler
+from vantage_cli.commands.util import (
+    execute_and_print_output,
+    specific_exception_handler,
+)
 
 
 @click.command("embedding-search")
@@ -14,7 +17,7 @@ from commands.util import execute_and_print_output, specific_exception_handler
     help="Embedding used for searching the collection.",
 )
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
@@ -89,7 +92,7 @@ def embedding_search(
 
 @click.command("semantic-search")
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
@@ -181,7 +184,7 @@ def semantic_search(
     help="Request ID.",
 )
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
@@ -270,7 +273,7 @@ def more_like_this_search(
     help="Request ID.",
 )
 @click.option(
-    "--collection_id",
+    "--collection-id",
     type=click.STRING,
     required=True,
     help="Collection ID.",
