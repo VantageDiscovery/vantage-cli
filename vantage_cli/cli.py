@@ -59,7 +59,6 @@ def create_executor(debug: bool):
 @click.option(
     "-d",
     "--debug-errors",
-    envvar="VANTAGE_ACCOUNT_ID",
     type=click.BOOL,
     default=False,
     help="Print debug info for errors returned by API.",
