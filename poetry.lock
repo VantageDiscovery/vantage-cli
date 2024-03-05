@@ -1789,7 +1789,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vantage-sdk"
-version = "0.0.7"
+version = "0.0.8"
 description = "Vantage Python SDK."
 optional = false
 python-versions = "*"
@@ -1893,4 +1893,4 @@ test = ["black", "flake8", "flake8-docstrings", "isort", "mypy", "pytest", "pyte
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "a9ffb856e1b3c5552e27861fef3e587c7470c5b7e1c363d4e71d8a972e967de8"
+content-hash = "a86248001c54cacbc828c409297f4fbfb92355f511f8787e9ed3c340d120d8f3"
