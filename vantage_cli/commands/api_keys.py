@@ -70,8 +70,9 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
     """Creates new external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.create_external_api_key(
             llm_provider=llm_provider,
             llm_secret=llm_secret,
@@ -88,8 +89,9 @@ def get_external_api_keys(ctx):
     """Lists existing external API keys."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: [
             item.__dict__ for item in client.get_external_api_keys()
         ],
@@ -109,8 +111,9 @@ def get_external_api_key(ctx, key_id):
     """Shows a specific external API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.get_external_api_key(
             external_key_id=key_id
         ).__dict__,
@@ -128,13 +131,13 @@ def get_external_api_key(ctx, key_id):
 @click.option(
     "--llm-provider",
     type=click.STRING,
-    required=True,
+    required=False,
     help="LLM provider ID supported by Vantage. Currently either \"OpenAPI\" or \"Hugging\".",
 )
 @click.option(
     "--llm-secret",
     type=click.STRING,
-    required=True,
+    required=False,
     help="Secret key used to access LLM provider's API",
 )
 @click.option(
@@ -146,8 +149,9 @@ def update_external_api_key(ctx, llm_provider, llm_secret, url, key_id):
     """Updates external API key data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.update_external_api_key(
             external_key_id=key_id,
             url=url,
@@ -175,8 +179,9 @@ def delete_external_api_key(ctx, key_id):
     """Deletes external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
 
-    execute_and_print_output(
+    executor.execute_and_print_output(
         command=lambda: client.delete_external_api_key(
             external_key_id=key_id
         ).__dict__,

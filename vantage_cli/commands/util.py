@@ -9,7 +9,7 @@ from vantage.exceptions import (
     VantageServiceError,
     VantageUnauthorizedError,
 )
-from vantage.model.search import MoreLikeThese
+from vantage.model.search import MoreLikeTheseItem
 import jsonpickle
 
 
@@ -73,10 +73,10 @@ def specific_exception_handler(
         return None
 
 
-def parse_more_like_these(json_string: str) -> list[MoreLikeThese]:
+def parse_more_like_these(json_string: str) -> list[MoreLikeTheseItem]:
     data = jsonpickle.loads(json_string)
 
     return [
-        MoreLikeThese(weight=item["weight"], query_text=item["text"])
+        MoreLikeTheseItem(weight=item["weight"], query_text=item["text"])
         for item in data
     ]

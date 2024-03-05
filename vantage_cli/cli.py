@@ -61,6 +61,7 @@ def create_executor(debug: bool):
     "--debug-errors",
     type=click.BOOL,
     default=False,
+    is_flag=True,
     help="Print debug info for errors returned by API.",
 )
 @click.option(

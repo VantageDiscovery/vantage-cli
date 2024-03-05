@@ -93,7 +93,7 @@ def create_collection(
             llm=llm_provider,
             external_key_id=external_key_id,
             collection_preview_url_pattern=collection_preview_url_pattern,
-        ),
+        ).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
     )
