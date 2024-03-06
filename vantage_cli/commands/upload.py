@@ -1,6 +1,7 @@
 import click
 from vantage import VantageClient
 from printer import Printer, ContentType
+import uuid
 
 
 def _upload_parquet(
@@ -20,14 +21,14 @@ def _upload_parquet(
 
 
 def _upload_documents(
-    client, collection_id, batch_identifier, documents_file
+    client: VantageClient, collection_id, batch_identifier, documents_file
 ) -> str:
-    response = client.upload_embedding_by_path(
+    response = client.upload_documents_from_path(
         collection_id=collection_id,
         file_path=documents_file,
-        customer_batch_identifier=batch_identifier,
+        batch_identifier=batch_identifier,
     )
-    if response == 200:
+    if response is None:
         content = "Uploaded successfully."
     else:
         content = f"Upload failed with status {response}"
@@ -61,6 +62,9 @@ def upload_parquet(ctx, collection_id, batch_identifier, parquet_file):
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
     printer.print_text(text="Uploading...")
+
+    if batch_identifier is None:
+        batch_identifier = str(uuid.uuid4())
 
     executor.execute_and_print_output(
         command=lambda: _upload_parquet(
@@ -100,6 +104,9 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
     printer.print_text(text="Uploading...")
+
+    if batch_identifier is None:
+        batch_identifier = str(uuid.uuid4())
 
     executor.execute_and_print_output(
         command=lambda: _upload_documents(

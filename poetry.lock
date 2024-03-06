@@ -918,13 +918,13 @@ files = [
 
 [[package]]
 name = "mkdocs-material"
-version = "9.5.12"
+version = "9.5.13"
 description = "Documentation that simply works"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "mkdocs_material-9.5.12-py3-none-any.whl", hash = "sha256:d6f0c269f015e48c76291cdc79efb70f7b33bbbf42d649cfe475522ebee61b1f"},
-    {file = "mkdocs_material-9.5.12.tar.gz", hash = "sha256:5f69cef6a8aaa4050b812f72b1094fda3d079b9a51cf27a247244c03ec455e97"},
+    {file = "mkdocs_material-9.5.13-py3-none-any.whl", hash = "sha256:5cbe17fee4e3b4980c8420a04cc762d8dc052ef1e10532abd4fce88e5ea9ce6a"},
+    {file = "mkdocs_material-9.5.13.tar.gz", hash = "sha256:d8e4caae576312a88fd2609b81cf43d233cdbe36860d67a68702b018b425bd87"},
 ]
 
 [package.dependencies]
@@ -1109,13 +1109,13 @@ files = [
 
 [[package]]
 name = "pip-tools"
-version = "7.4.0"
+version = "7.4.1"
 description = "pip-tools keeps your pinned dependencies fresh."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "pip-tools-7.4.0.tar.gz", hash = "sha256:a92a6ddfa86ff389fe6ace381d463bc436e2c705bd71d52117c25af5ce867bb7"},
-    {file = "pip_tools-7.4.0-py3-none-any.whl", hash = "sha256:b67432fd0759ed834c5367f9e0ce8c95441acecfec9c8e24b41aca166757adf0"},
+    {file = "pip-tools-7.4.1.tar.gz", hash = "sha256:864826f5073864450e24dbeeb85ce3920cdfb09848a3d69ebf537b521f14bcc9"},
+    {file = "pip_tools-7.4.1-py3-none-any.whl", hash = "sha256:4c690e5fbae2f21e87843e89c26191f0d9454f362d8acdbd695716493ec8b3a9"},
 ]
 
 [package.dependencies]
@@ -1712,13 +1712,13 @@ files = [
 
 [[package]]
 name = "tox"
-version = "4.13.0"
+version = "4.14.0"
 description = "tox is a generic virtualenv management and test command line tool"
 optional = true
 python-versions = ">=3.8"
 files = [
-    {file = "tox-4.13.0-py3-none-any.whl", hash = "sha256:1143c7e2489c68026a55d3d4ae84c02c449f073b28e62f80e3e440a3b72a4afa"},
-    {file = "tox-4.13.0.tar.gz", hash = "sha256:dd789a554c16c4b532924ba393c92fc8991323c4b3d466712bfecc8c9b9f24f7"},
+    {file = "tox-4.14.0-py3-none-any.whl", hash = "sha256:35976739e39e60e913bef4cf8226be64eb9eed6fdb9a44c6924265ebe11cbcae"},
+    {file = "tox-4.14.0.tar.gz", hash = "sha256:286807f8a581e55785dc30ff956a81583016625f6dd296948aa7a43001c1bb00"},
 ]
 
 [package.dependencies]
@@ -1789,7 +1789,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vantage-sdk"
-version = "0.0.8"
+version = "0.0.9"
 description = "Vantage Python SDK."
 optional = false
 python-versions = "*"
@@ -1893,4 +1893,4 @@ test = ["black", "flake8", "flake8-docstrings", "isort", "mypy", "pytest", "pyte
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "a86248001c54cacbc828c409297f4fbfb92355f511f8787e9ed3c340d120d8f3"
+content-hash = "d7d87772a8a1b0d17cda91c9504d9019bbc28475e9bc75819cfc7e1ecb188b93"

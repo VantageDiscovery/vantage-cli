@@ -174,16 +174,10 @@ def semantic_search(
 
 @click.command("more-like-this-search")
 @click.option(
-    "--document_id",
+    "--document-id",
     type=click.STRING,
     required=True,
     help="ID of a document in a collection.",
-)
-@click.option(
-    "--request_id",
-    type=click.STRING,
-    required=True,
-    help="Request ID.",
 )
 @click.option(
     "--collection-id",
@@ -225,7 +219,6 @@ def semantic_search(
 def more_like_this_search(
     ctx,
     document_id,
-    request_id,
     collection_id,
     accuracy,
     page,
@@ -247,7 +240,6 @@ def more_like_this_search(
                 collection_id=collection_id,
                 page=page,
                 page_count=items_per_page,
-                request_id=request_id,
                 boolean_filter=boolean_filter,
                 vantage_api_key=vantage_api_key,
             ).results
@@ -264,16 +256,10 @@ def more_like_this_search(
 
 @click.command("more-like-these-search")
 @click.option(
-    "--document_id",
+    "--document-id",
     type=click.STRING,
     required=True,
     help="ID of a document in a collection.",
-)
-@click.option(
-    "--request_id",
-    type=click.STRING,
-    required=True,
-    help="Request ID.",
 )
 @click.option(
     "--collection-id",
@@ -320,7 +306,6 @@ def more_like_this_search(
 def more_like_these_search(
     ctx,
     document_id,
-    request_id,
     collection_id,
     accuracy,
     page,
@@ -354,7 +339,6 @@ def more_like_these_search(
                 collection_id=collection_id,
                 page=page,
                 page_count=items_per_page,
-                request_id=request_id,
                 boolean_filter=boolean_filter,
                 vantage_api_key=vantage_api_key,
                 more_like_these=more_like_these,

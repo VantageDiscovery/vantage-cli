@@ -31,14 +31,30 @@ from vantage_cli.printer import create_printer
 from vantage import VantageClient
 from vantage_cli.commands.util import CommandExecutor
 
-DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
+DEFAULT_API_HOST = "https://api.stage-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
 
 
-def create_client(jwt_token: str, account_id: str):
+def create_client_from_jwt(jwt_token: str, account_id: str):
     return VantageClient.using_jwt_token(
         vantage_api_jwt_token=jwt_token,
         api_host=DEFAULT_API_HOST,
+        account_id=account_id,
+    )
+
+
+def create_client_from_credentials(
+    account_id: str,
+    client_id: str,
+    client_secret: str,
+    api_host: str,
+    auth_host: str,
+):
+    return VantageClient.using_client_credentials(
+        vantage_client_id=client_id,
+        vantage_client_secret=client_secret,
+        api_host=api_host,
+        auth_host=auth_host,
         account_id=account_id,
     )
 
@@ -70,7 +86,26 @@ def create_executor(debug: bool):
     envvar="VANTAGE_API_JWT_TOKEN",
     type=click.STRING,
     default=None,
+    required=False,
     help="JWT token for accessing API.",
+)
+@click.option(
+    "-i",
+    "--client-id",
+    envvar="VANTAGE_API_CLIENT_ID",
+    type=click.STRING,
+    default=None,
+    required=False,
+    help="Client API ID.",
+)
+@click.option(
+    "-s",
+    "--client-secret",
+    envvar="VANTAGE_API_CLIENT_SECRET",
+    type=click.STRING,
+    default=None,
+    required=False,
+    help="Client API secret.",
 )
 @click.option(
     "-o",
@@ -79,12 +114,54 @@ def create_executor(debug: bool):
     default="json",
     help="Command execution result print format.",
 )
+@click.option(
+    "--api-host",
+    type=click.STRING,
+    default=DEFAULT_API_HOST,
+    help="Specify non-default API host (used for development).",
+)
+@click.option(
+    "--auth-host",
+    type=click.STRING,
+    default=DEFAULT_AUTH_HOST,
+    help="Specify non-default auth host (used for development).",
+)
 @click.pass_context
-def cli(ctx, account_id, jwt_token, output_type, debug_errors):
+def cli(
+    ctx,
+    account_id,
+    jwt_token,
+    output_type,
+    debug_errors,
+    api_host,
+    auth_host,
+    client_id,
+    client_secret,
+):
     ctx.ensure_object(dict)
-    ctx.obj["client"] = create_client(
-        jwt_token=jwt_token, account_id=account_id
-    )
+
+    client = None
+
+    if jwt_token is not None:
+        client = create_client_from_jwt(
+            jwt_token=jwt_token, account_id=account_id
+        )
+    elif client_id is not None and client_secret is not None:
+        client = create_client_from_credentials(
+            account_id=account_id,
+            client_id=client_id,
+            client_secret=client_secret,
+            api_host=api_host,
+            auth_host=auth_host,
+        )
+
+    if client is None:
+        click.echo(
+            "Either JWT token or client ID and secret need to be specified."
+        )
+        exit(127)
+
+    ctx.obj["client"] = client
     ctx.obj["printer"] = create_printer(output_type=output_type)
     ctx.obj["executor"] = create_executor(debug=debug_errors)
 
