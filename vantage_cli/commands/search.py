@@ -152,7 +152,7 @@ def semantic_search(
     executor.execute_and_print_output(
         command=lambda: [
             item.__dict__
-            for item in client.embedding_search(
+            for item in client.semantic_search(
                 text=text,
                 collection_id=collection_id,
                 accuracy=accuracy,
