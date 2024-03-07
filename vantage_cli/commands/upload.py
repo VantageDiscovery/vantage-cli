@@ -5,12 +5,13 @@ import uuid
 
 
 def _upload_parquet(
-    client, collection_id, batch_identifier, parquet_file
+    client,
+    collection_id,
+    parquet_file,
 ) -> str:
-    response = client.upload_embedding_by_path(
+    response = client.upload_embedding_from_parquet_file(
         collection_id=collection_id,
         file_path=parquet_file,
-        customer_batch_identifier=batch_identifier,
     )
     if response == 200:
         content = "Uploaded successfully."
@@ -43,19 +44,13 @@ def _upload_documents(
     required=True,
     help="Collection ID.",
 )
-@click.option(
-    "--batch-identifier",
-    type=click.STRING,
-    required=False,
-    help="Customer batch identifier.",
-)
 @click.argument(
     "parquet-file",
     required=True,
     type=click.STRING,
 )
 @click.pass_obj
-def upload_parquet(ctx, collection_id, batch_identifier, parquet_file):
+def upload_parquet(ctx, collection_id, parquet_file):
     """Uploads embeddings from .parquet file."""
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
@@ -63,14 +58,10 @@ def upload_parquet(ctx, collection_id, batch_identifier, parquet_file):
     executor = ctx["executor"]
     printer.print_text(text="Uploading...")
 
-    if batch_identifier is None:
-        batch_identifier = str(uuid.uuid4())
-
     executor.execute_and_print_output(
         command=lambda: _upload_parquet(
             client=client,
             collection_id=collection_id,
-            batch_identifier=batch_identifier,
             parquet_file=parquet_file,
         ),
         output_type=ContentType.PLAINTEXT,
