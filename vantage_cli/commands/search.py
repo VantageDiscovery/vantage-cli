@@ -1,4 +1,5 @@
 import click
+import jsonpickle
 from vantage_cli.commands.util import parse_more_like_these
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
@@ -10,12 +11,6 @@ from vantage_cli.commands.util import (
 
 
 @click.command("embedding-search")
-@click.option(
-    "--embedding",
-    type=click.STRING,
-    required=True,
-    help="Embedding used for searching the collection.",
-)
 @click.option(
     "--collection-id",
     type=click.STRING,
@@ -52,6 +47,11 @@ from vantage_cli.commands.util import (
     required=False,
     help="Search filter.",
 )
+@click.argument(
+    "embedding",
+    type=click.STRING,
+    required=True,
+)
 @click.pass_obj
 def embedding_search(
     ctx,
@@ -72,7 +72,7 @@ def embedding_search(
         command=lambda: [
             item.__dict__
             for item in client.embedding_search(
-                embedding=embedding,
+                embedding=jsonpickle.loads(embedding),
                 collection_id=collection_id,
                 accuracy=accuracy,
                 page=page,
