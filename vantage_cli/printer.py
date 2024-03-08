@@ -3,7 +3,8 @@ from typing import Any
 import jsonpickle
 import csv
 from io import StringIO
-import click
+import sys
+from dataclasses import dataclass
 
 
 class ContentType(Enum):
@@ -13,22 +14,49 @@ class ContentType(Enum):
     PLAINTEXT = "plaintext"
 
 
-class OutputType(Enum):
+class OutputFormat(Enum):
     JSON = "json"
     PLAINTEXT = "plaintext"
     CSV = "csv"
 
 
-class Printable:
+class PrinterOutput(Enum):
+    STDOUT = "stdout"
+    STDERR = "stderr"
 
-    def __init__(self, content: str | dict | list, content_type: ContentType):
-        self.content = content
-        self.content_type = content_type
+
+@dataclass(frozen=True)
+class Printable:
+    content: str | dict | list
+    content_type: ContentType
+    printer_output: PrinterOutput
+
+    @staticmethod
+    def stdout(
+        content: str | dict | list,
+        content_type: ContentType,
+    ):
+        return Printable(
+            content=content,
+            content_type=content_type,
+            printer_output=PrinterOutput.STDOUT,
+        )
+
+    @staticmethod
+    def stderr(
+        content: str | dict | list,
+        content_type: ContentType,
+    ):
+        return Printable(
+            content=content,
+            content_type=content_type,
+            printer_output=PrinterOutput.STDERR,
+        )
 
 
 class Printer:
 
-    def __init__(self, output_type: OutputType):
+    def __init__(self, output_type: OutputFormat):
         self.output_type = output_type
 
     def _to_json(self, content: dict[str, Any]) -> str:
@@ -52,19 +80,39 @@ class Printer:
     def parse(self, printable: Printable) -> str:
         if printable is None or printable.content is None:
             return ""
-        if self.output_type == OutputType.JSON:
+        if self.output_type == OutputFormat.JSON:
             return self._to_json(printable.content)
-        elif self.output_type == OutputType.CSV:
+        elif self.output_type == OutputFormat.CSV:
             return self._to_csv(printable.content)
-        elif self.output_type == OutputType.PLAINTEXT:
+        elif self.output_type == OutputFormat.PLAINTEXT:
             return printable.content
 
-    def print(self, content) -> None:
-        click.echo(self.parse(content))
+    def print(self, content: Printable) -> None:
+        if PrinterOutput.STDOUT.value == content.printer_output.value:
+            self.stdout(self.parse(content))
+        elif PrinterOutput.STDERR == content.printer_output.value:
+            self.stderr(self.parse(content))
+        else:
+            self.stderr(
+                f"warning: unknown output type: {content.printer_output}"
+            )
+            self.stdout(self.parse(content))
+
+    def stdout(self, text: str) -> None:
+        print(text, file=sys.stdout)
+
+    def stderr(self, text: str) -> None:
+        print(text, file=sys.stderr)
 
     def print_text(self, text) -> None:
-        self.print(Printable(content=text, content_type=ContentType.PLAINTEXT))
+        self.print(
+            Printable(
+                content=text,
+                content_type=ContentType.PLAINTEXT,
+                printer_output=PrinterOutput.STDOUT,
+            )
+        )
 
 
 def create_printer(output_type: str):
-    return Printer(output_type=OutputType[output_type.upper()])
+    return Printer(output_type=OutputFormat[output_type.upper()])

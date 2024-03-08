@@ -1,5 +1,5 @@
 from typing import Callable, Optional, Type
-from printer import Printable, ContentType, Printer
+from printer import Printable, ContentType, Printer, PrinterOutput
 import traceback
 from vantage.exceptions import (
     VantageForbiddenError,
@@ -42,7 +42,7 @@ class CommandExecutor:
         printable = None
 
         try:
-            printable = Printable(
+            printable = Printable.stdout(
                 content=command(),
                 content_type=output_type,
             )
@@ -54,7 +54,32 @@ class CommandExecutor:
             if exception_handler:
                 printable = exception_handler(exception)
             if not printable:
-                printable = Printable(
+                printable = Printable.stderr(
+                    content=self.get_generic_message_for_exception(exception),
+                    content_type=ContentType.PLAINTEXT,
+                )
+        printer.print(printable)
+
+    def execute_and_print_printable(
+        self,
+        command: Callable,
+        output_type: ContentType,
+        printer: Printer,
+        exception_handler: Optional[Callable] = None,
+    ) -> None:
+        printable = None
+
+        try:
+            printable = command()
+        except Exception as exception:
+            if self.debug_exceptions:
+                print(traceback.format_exc())
+                return
+
+            if exception_handler:
+                printable = exception_handler(exception)
+            if not printable:
+                printable = Printable.stderr(
                     content=self.get_generic_message_for_exception(exception),
                     content_type=ContentType.PLAINTEXT,
                 )
@@ -65,8 +90,8 @@ def specific_exception_handler(
     exception: Exception, class_type: Type, message: str
 ) -> Printable:
     if isinstance(exception, class_type):
-        return Printable(
-            content="Collection not found.",
+        return Printable.stderr(
+            content=message,
             content_type=ContentType.PLAINTEXT,
         )
     else:

@@ -1,5 +1,5 @@
 from vantage import VantageClient
-from printer import Printer, OutputType
+from printer import Printer, OutputFormat
 
 DEFAULT_API_HOST = "https://api.dev-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
@@ -14,4 +14,4 @@ def create_client(jwt_token: str, account_id: str):
 
 
 def create_printer(output_type: str):
-    return Printer(output_type=OutputType[output_type.upper()])
+    return Printer(output_type=OutputFormat[output_type.upper()])

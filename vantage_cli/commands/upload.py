@@ -1,7 +1,8 @@
 import click
 from vantage import VantageClient
-from printer import Printer, ContentType
+from printer import Printer, ContentType, Printable, PrinterOutput
 import uuid
+from vantage_cli.commands.util import CommandExecutor
 
 
 def _upload_parquet(
@@ -13,12 +14,17 @@ def _upload_parquet(
         collection_id=collection_id,
         file_path=parquet_file,
     )
-    if response == 200:
-        content = "Uploaded successfully."
-    else:
-        content = f"Upload failed with status {response}"
 
-    return content
+    if response == 200:
+        return Printable.stdout(
+            content="Uploaded successfully.",
+            content_type=ContentType.PLAINTEXT,
+        )
+    else:
+        return Printable.stderr(
+            content=f"Upload failed with status {response}",
+            content_type=ContentType.PLAINTEXT,
+        )
 
 
 def _upload_documents(
@@ -29,12 +35,17 @@ def _upload_documents(
         file_path=documents_file,
         batch_identifier=batch_identifier,
     )
-    if response is None:
-        content = "Uploaded successfully."
-    else:
-        content = f"Upload failed with status {response}"
 
-    return content
+    if response is None:
+        return Printable.stdout(
+            content="Uploaded successfully.",
+            content_type=ContentType.PLAINTEXT,
+        )
+    else:
+        return Printable.stderr(
+            content=f"Upload failed with status {response}",
+            content_type=ContentType.PLAINTEXT,
+        )
 
 
 @click.command("upload-parquet")
@@ -55,10 +66,10 @@ def upload_parquet(ctx, collection_id, parquet_file):
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     printer.print_text(text="Uploading...")
 
-    executor.execute_and_print_output(
+    executor.execute_and_print_printable(
         command=lambda: _upload_parquet(
             client=client,
             collection_id=collection_id,
@@ -93,13 +104,13 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     printer.print_text(text="Uploading...")
 
     if batch_identifier is None:
         batch_identifier = str(uuid.uuid4())
 
-    executor.execute_and_print_output(
+    executor.execute_and_print_printable(
         command=lambda: _upload_documents(
             client=client,
             collection_id=collection_id,
