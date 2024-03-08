@@ -13,15 +13,15 @@ from vantage_cli.commands.api_keys import (
     update_external_api_key,
     delete_external_api_key,
 )
-from commands.collections import (
+from vantage_cli.commands.collections import (
     create_collection,
     delete_collection,
     get_collection,
     list_collections,
     update_collection,
 )
-from commands.upload import upload_parquet, upload_documents
-from commands.search import (
+from vantage_cli.commands.upload import upload_parquet, upload_documents
+from vantage_cli.commands.search import (
     embedding_search,
     more_like_these_search,
     more_like_this_search,
@@ -30,6 +30,10 @@ from commands.search import (
 from vantage_cli.printer import create_printer
 from vantage import VantageClient
 from vantage_cli.commands.util import CommandExecutor
+from vantage_cli.config import (
+    default_config_file,
+    configuration_callback,
+)
 
 DEFAULT_API_HOST = "https://api.stage-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
@@ -64,6 +68,16 @@ def create_executor(debug: bool):
 
 
 @click.group()
+@click.option(
+    "-c",
+    "--config-file",
+    type=click.Path(),
+    default=default_config_file(),
+    required=False,
+    callback=configuration_callback,
+    is_eager=True,
+    help="Path to config file.",
+)
 @click.option(
     "-a",
     "--account-id",
@@ -137,6 +151,7 @@ def cli(
     auth_host,
     client_id,
     client_secret,
+    config_file,
 ):
     ctx.ensure_object(dict)
 
