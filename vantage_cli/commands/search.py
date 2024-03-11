@@ -1,3 +1,4 @@
+import sys
 import click
 import jsonpickle
 from vantage_cli.commands.util import parse_more_like_these
@@ -301,8 +302,9 @@ def more_like_this_search(
     help="Search filter.",
 )
 @click.argument(
-    "more-like-these",
-    type=click.STRING,
+    "more-like-these-json",
+    type=click.File('r'),
+    default=sys.stdin,
     required=True,
 )
 @click.pass_obj
@@ -316,13 +318,18 @@ def more_like_these_search(
     vantage_api_key,
     more_like_these,
 ):
-    """Finds more like these."""
+    """
+    Finds more like these.
+
+    MORE_LIKE_THESE_JSON is a .json file containing a list of `these` objects.
+    It can be provided as a file, or read from stdin.
+    """
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
 
     try:
-        more_like_these = parse_more_like_these(more_like_these)
+        more_like_these = parse_more_like_these(more_like_these.read())
     except Exception:
         printer.print(
             Printable.stderr(

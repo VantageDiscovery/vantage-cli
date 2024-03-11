@@ -1,18 +1,24 @@
+import os
+import sys
 import click
 from vantage import VantageClient
-from printer import Printer, ContentType, Printable, PrinterOutput
+from printer import Printer, ContentType, Printable
 import uuid
 from vantage_cli.commands.util import CommandExecutor
 
 
 def _upload_parquet(
     client,
-    collection_id,
-    parquet_file,
+    collection_id: str,
+    content: bytes,
+    file_size: int,
+    parquet_file_name: str,
 ) -> str:
-    response = client.upload_embedding_from_parquet_file(
+    response = client.upload_parquet_embedding(
         collection_id=collection_id,
-        file_path=parquet_file,
+        content=content,
+        file_size=file_size,
+        parquet_file_name=parquet_file_name,
     )
 
     if response == 200:
@@ -30,9 +36,9 @@ def _upload_parquet(
 def _upload_documents(
     client: VantageClient, collection_id, batch_identifier, documents_file
 ) -> str:
-    response = client.upload_documents_from_path(
+    response = client.upload_documents_from_jsonl(
         collection_id=collection_id,
-        file_path=documents_file,
+        documents=documents_file.read(),
         batch_identifier=batch_identifier,
     )
 
@@ -58,22 +64,40 @@ def _upload_documents(
 @click.argument(
     "parquet-file",
     required=True,
-    type=click.STRING,
+    type=click.File('rb'),
+    default=sys.stdin,
 )
 @click.pass_obj
 def upload_parquet(ctx, collection_id, parquet_file):
-    """Uploads embeddings from .parquet file."""
+    """
+    Upload embeddings from Parquet file.
+
+    DOCUMENTS_FILE is a file containing documents in Parquet format.
+    It can be passed as a path to a file, or it can be read from stdin.
+    """
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
-    printer.print_text(text="Uploading...")
+
+    if parquet_file.name == "<stdin>":
+        printer.print_text(text="Uploading from stdin...")
+        data = parquet_file.buffer.read()
+        # Batch identifier MUST have a .parquet suffix,
+        # otherwise service won't process it.
+        file_name = f"{str(uuid.uuid4())}.parquet"
+    else:
+        file_name = os.path.basename(parquet_file.name)
+        printer.print_text(text=f"Uploading file '{file_name}'...")
+        data = parquet_file.read()
 
     executor.execute_and_print_printable(
         command=lambda: _upload_parquet(
             client=client,
             collection_id=collection_id,
-            parquet_file=parquet_file,
+            content=data,
+            file_size=len(data),
+            parquet_file_name=file_name,
         ),
         output_type=ContentType.PLAINTEXT,
         printer=printer,
@@ -95,12 +119,18 @@ def upload_parquet(ctx, collection_id, parquet_file):
 )
 @click.argument(
     "documents-file",
-    type=click.STRING,
+    type=click.File('r'),
+    default=sys.stdin,
     required=True,
 )
 @click.pass_obj
 def upload_documents(ctx, collection_id, documents_file, batch_identifier):
-    """Upload embeddings from .jsonl file."""
+    """
+    Upload embeddings from JSONL file.
+
+    DOCUMENTS_FILE is a file containing documents in JSONL format.
+    It can be passed as a path to a file, or it can be read from stdin.
+    """
     # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
@@ -108,7 +138,10 @@ def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     printer.print_text(text="Uploading...")
 
     if batch_identifier is None:
-        batch_identifier = str(uuid.uuid4())
+        if documents_file.name == "<stdin>":
+            batch_identifier = {str(uuid.uuid4())}
+        else:
+            batch_identifier = os.path.basename(documents_file.name)
 
     executor.execute_and_print_printable(
         command=lambda: _upload_documents(
