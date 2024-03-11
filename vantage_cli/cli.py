@@ -67,7 +67,7 @@ def create_executor(debug: bool):
     return CommandExecutor(debug_exceptions=debug)
 
 
-@click.group()
+@click.group(invoke_without_command=True)
 @click.option(
     "-c",
     "--config-file",
@@ -153,6 +153,12 @@ def cli(
     client_secret,
     config_file,
 ):
+    if ctx.invoked_subcommand is None:
+        click.echo(
+            f"No command specified. Run {ctx.info_name} --help for help."
+        )
+        exit(1)
+
     ctx.ensure_object(dict)
 
     client = None

@@ -322,7 +322,7 @@ def more_like_these_search(
     Finds more like these.
 
     MORE_LIKE_THESE_JSON is a .json file containing a list of `these` objects.
-    It can be provided as a file, or read from stdin.
+    It can be passed as a path to a file, or it can be read from stdin.
     """
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
