@@ -75,19 +75,21 @@ def upload_parquet(ctx, collection_id, parquet_file):
     DOCUMENTS_FILE is a file containing documents in Parquet format.
     It can be passed as a path to a file, or it can be read from stdin.
     """
-    # TODO: implement uploading both from file and stdin
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
 
+    # NOTE: Batch identifier MUST have a ".parquet" suffix,
+    # otherwise service won't process it.
+
     if parquet_file.name == "<stdin>":
         printer.print_text(text="Uploading from stdin...")
         data = parquet_file.buffer.read()
-        # Batch identifier MUST have a .parquet suffix,
-        # otherwise service won't process it.
         file_name = f"{str(uuid.uuid4())}.parquet"
     else:
-        file_name = os.path.basename(parquet_file.name)
+        file_name = os.path.basename(parquet_file.name).lower()
+        if not file_name.endswith(".parquet"):
+            file_name = f"{file_name}.parquet"
         printer.print_text(text=f"Uploading file '{file_name}'...")
         data = parquet_file.read()
 
