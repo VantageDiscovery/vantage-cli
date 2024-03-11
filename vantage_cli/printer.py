@@ -88,9 +88,9 @@ class Printer:
             return printable.content
 
     def print(self, content: Printable) -> None:
-        if PrinterOutput.STDOUT.value == content.printer_output.value:
+        if PrinterOutput.STDOUT.name == content.printer_output.name:
             self.stdout(self.parse(content))
-        elif PrinterOutput.STDERR == content.printer_output.value:
+        elif PrinterOutput.STDERR.name == content.printer_output.name:
             self.stderr(self.parse(content))
         else:
             self.stderr(

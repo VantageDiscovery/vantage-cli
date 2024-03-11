@@ -10,6 +10,15 @@ from vantage_cli.commands.util import (
 )
 
 
+# Used to pass API key from configuration.
+COMMAND_NAMES = [
+    "embedding-search",
+    "semantic-search",
+    "more-like-this",
+    "more-like-these",
+]
+
+
 @click.command("embedding-search")
 @click.option(
     "--collection-id",

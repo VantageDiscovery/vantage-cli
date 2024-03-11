@@ -36,7 +36,6 @@ mkdocs = {version = "^1.5.3", optional = true}
 mkdocs-material = {version = "^9.5.3", optional = true}
 mkdocs-include-markdown-plugin = {version = "^4.0.0", optional = true}
 jsonpickle = ">= 3.0"
-platformdirs = ">= 4"
 
 [tool.poetry.extras]
 test = [
