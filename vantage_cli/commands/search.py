@@ -14,8 +14,8 @@ from vantage_cli.commands.util import (
 COMMAND_NAMES = [
     "embedding-search",
     "semantic-search",
-    "more-like-this",
-    "more-like-these",
+    "more-like-this-search",
+    "more-like-these-search",
 ]
 
 
@@ -265,12 +265,6 @@ def more_like_this_search(
 
 @click.command("more-like-these-search")
 @click.option(
-    "--document-id",
-    type=click.STRING,
-    required=True,
-    help="ID of a document in a collection.",
-)
-@click.option(
     "--collection-id",
     type=click.STRING,
     required=True,
@@ -314,7 +308,6 @@ def more_like_this_search(
 @click.pass_obj
 def more_like_these_search(
     ctx,
-    document_id,
     collection_id,
     accuracy,
     page,
@@ -332,7 +325,7 @@ def more_like_these_search(
         more_like_these = parse_more_like_these(more_like_these)
     except Exception:
         printer.print(
-            Printable(
+            Printable.stderr(
                 content="Invalid JSON input",
                 content_type=ContentType.PLAINTEXT,
             )
@@ -344,7 +337,6 @@ def more_like_these_search(
             item.__dict__
             for item in client.more_like_these_search(
                 accuracy=accuracy,
-                document_id=document_id,
                 collection_id=collection_id,
                 page=page,
                 page_count=items_per_page,
