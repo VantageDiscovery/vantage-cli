@@ -106,3 +106,4 @@ def initial_configuration_propmpt(config_loader: ConfigLoader) -> None:
     with open(config_loader.path, "w") as file:
         config.write(file, space_around_delimiters=True)
         file.close()
+    click.echo(f"Created config file at {config_loader.path}")
