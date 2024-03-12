@@ -5,6 +5,12 @@ from vantage_cli.commands.util import specific_exception_handler
 from vantage_cli.printer import Printer, ContentType
 
 
+def _delete_collection(client, collection_id: str) -> str:
+    client.delete_collection(collection_id=collection_id)
+
+    return {"id": collection_id}
+
+
 @click.command("list-collections")
 @click.pass_obj
 def list_collections(ctx):
@@ -193,7 +199,7 @@ def delete_collection(ctx, collection_id):
     executor = ctx["executor"]
 
     executor.execute_and_print_output(
-        lambda: client.delete_collection(collection_id=collection_id).__dict__,
+        lambda: _delete_collection(client=client, collection_id=collection_id),
         ContentType.OBJECT,
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
