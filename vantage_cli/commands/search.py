@@ -316,7 +316,7 @@ def more_like_these_search(
     items_per_page,
     boolean_filter,
     vantage_api_key,
-    more_like_these,
+    more_like_these_json,
 ):
     """
     Finds more like these.
@@ -329,7 +329,7 @@ def more_like_these_search(
     executor: CommandExecutor = ctx["executor"]
 
     try:
-        more_like_these = parse_more_like_these(more_like_these.read())
+        more_like_these = parse_more_like_these(more_like_these_json.read())
     except Exception:
         printer.print(
             Printable.stderr(
