@@ -2,7 +2,7 @@ import os
 import sys
 import click
 from vantage import VantageClient
-from printer import Printer, ContentType, Printable
+from vantage_cli.printer import Printer, ContentType, Printable
 import uuid
 from vantage_cli.commands.util import CommandExecutor
 

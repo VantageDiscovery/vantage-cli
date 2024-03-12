@@ -2,7 +2,7 @@ import click
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
 from vantage_cli.commands.util import specific_exception_handler
-from printer import Printer, ContentType
+from vantage_cli.printer import Printer, ContentType
 
 
 @click.command("list-collections")

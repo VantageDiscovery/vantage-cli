@@ -4,7 +4,7 @@ import jsonpickle
 from vantage_cli.commands.util import parse_more_like_these
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
-from printer import Printer, Printable, ContentType
+from vantage_cli.printer import Printer, Printable, ContentType
 from vantage_cli.commands.util import (
     specific_exception_handler,
     CommandExecutor,

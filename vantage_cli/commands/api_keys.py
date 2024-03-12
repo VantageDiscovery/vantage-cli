@@ -1,5 +1,5 @@
 import click
-from printer import ContentType, Printer
+from vantage_cli.printer import ContentType, Printer
 from vantage import VantageClient
 from vantage.exceptions import VantageNotFoundError
 from vantage_cli.commands.util import specific_exception_handler

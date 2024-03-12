@@ -1,5 +1,5 @@
 from typing import Callable, Optional, Type
-from printer import Printable, ContentType, Printer, PrinterOutput
+from vantage_cli.printer import Printable, ContentType, Printer
 import traceback
 from vantage.exceptions import (
     VantageForbiddenError,

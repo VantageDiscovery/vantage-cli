@@ -39,10 +39,10 @@ DEFAULT_API_HOST = "https://api.stage-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
 
 
-def create_client_from_jwt(jwt_token: str, account_id: str):
+def create_client_from_jwt(jwt_token: str, account_id: str, api_host: str):
     return VantageClient.using_jwt_token(
         vantage_api_jwt_token=jwt_token,
-        api_host=DEFAULT_API_HOST,
+        api_host=api_host,
         account_id=account_id,
     )
 
@@ -165,7 +165,7 @@ def cli(
 
     if jwt_token is not None:
         client = create_client_from_jwt(
-            jwt_token=jwt_token, account_id=account_id
+            jwt_token=jwt_token, account_id=account_id, api_host=api_host
         )
     elif client_id is not None and client_secret is not None:
         client = create_client_from_credentials(
@@ -209,4 +209,4 @@ cli.add_command(more_like_this_search)
 cli.add_command(semantic_search)
 
 if __name__ == "__main__":
-    cli()  # pragma: no cover
+    cli(["get-account"])  # pragma: no cover
