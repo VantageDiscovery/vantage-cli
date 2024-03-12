@@ -9,7 +9,7 @@ from vantage_cli.commands.search import COMMAND_NAMES as search_commands
 CONFIG_FILE = "config.ini"
 APP_NAME = "vantage-cli"
 GENERAL_SECTION = "general"
-SEARCH_SECTION = "search"
+SEARCH_SECTION = "general.search"
 
 
 def default_config_file() -> str:
@@ -87,6 +87,16 @@ def configuration_callback(ctx: click.core.Context, param, filename):
             search_config = dict(config[SEARCH_SECTION])
             for command in search_commands:
                 general_config[command] = search_config
+
+        for section in config.sections():
+            if section == GENERAL_SECTION or section == SEARCH_SECTION:
+                continue
+            if section in general_config:
+                general_config[section] = general_config[section] | dict(
+                    config[section]
+                )
+            else:
+                general_config[section] = dict(config[section])
 
         ctx.default_map = general_config
 
