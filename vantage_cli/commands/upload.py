@@ -18,7 +18,7 @@ def _upload_parquet(
         collection_id=collection_id,
         content=content,
         file_size=file_size,
-        parquet_file_name=parquet_file_name,
+        batch_identifier=parquet_file_name,
     )
 
     if response == 200:
