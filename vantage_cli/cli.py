@@ -209,4 +209,4 @@ cli.add_command(more_like_this_search)
 cli.add_command(semantic_search)
 
 if __name__ == "__main__":
-    cli(["get-account"])  # pragma: no cover
+    cli()  # pragma: no cover
