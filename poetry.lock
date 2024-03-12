@@ -1790,7 +1790,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vantage-sdk"
-version = "0.0.10"
+version = "0.0.12"
 description = "Vantage Python SDK."
 optional = false
 python-versions = "*"
@@ -1859,13 +1859,13 @@ watchmedo = ["PyYAML (>=3.10)"]
 
 [[package]]
 name = "wheel"
-version = "0.42.0"
+version = "0.43.0"
 description = "A built-package format for Python"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "wheel-0.42.0-py3-none-any.whl", hash = "sha256:177f9c9b0d45c47873b619f5b650346d632cdc35fb5e4d25058e09c9e581433d"},
-    {file = "wheel-0.42.0.tar.gz", hash = "sha256:c45be39f7882c9d34243236f2d63cbd58039e360f85d0913425fbd7ceea617a8"},
+    {file = "wheel-0.43.0-py3-none-any.whl", hash = "sha256:55c570405f142630c6b9f72fe09d9b67cf1477fcf543ae5b8dcb1f5b7377da81"},
+    {file = "wheel-0.43.0.tar.gz", hash = "sha256:465ef92c69fa5c5da2d1cf8ac40559a8c940886afcef87dcf14b9470862f1d85"},
 ]
 
 [package.extras]
@@ -1894,4 +1894,4 @@ test = ["black", "flake8", "flake8-docstrings", "isort", "mypy", "pytest", "pyte
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "6f9f4252e92f1cec5e467e154e356e4b7406aebf1117e771d04f490a9badd5a8"
+content-hash = "79927ef134b231feaa40932cede4dd94f1ab5b5f2a22ee4932fe681b1b202ebe"
