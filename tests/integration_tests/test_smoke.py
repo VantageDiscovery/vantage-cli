@@ -148,3 +148,44 @@ class TestCollections:
                 collection_id,
             ],
         )
+
+
+class TestKeys:
+    def test_get_vantage_api_keys(self, config_path, runner) -> None:
+        # When
+        result = runner.invoke(
+            cli, ["-c", config_path, "get-vantage-api-keys"]
+        )
+
+        # Then
+        assert result.exit_code == 0
+
+    def test_get_external_api_keys(self, config_path, runner) -> None:
+        # When
+        result = runner.invoke(
+            cli, ["-c", config_path, "get-external-api-keys"]
+        )
+
+        # Then
+        assert result.exit_code == 0
+
+
+class TestSearch:
+    def test_embedding_search(
+        self, config_path, search_test_collection, runner
+    ) -> None:
+        # When
+        result = runner.invoke(
+            cli,
+            [
+                "-c",
+                config_path,
+                "embedding-search",
+                "--collection-id",
+                search_test_collection,
+                str([0.1 for col in range(1536)]),
+            ],
+        )
+
+        # Then
+        assert result.exit_code == 0

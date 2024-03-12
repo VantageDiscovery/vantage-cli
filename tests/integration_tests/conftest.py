@@ -33,3 +33,8 @@ def config_path() -> Optional[str]:
         pytest.skip(f"No test config file available in {str(config_path)}.")
 
     return str(config_path)
+
+
+@pytest.fixture(scope="module")
+def search_test_collection() -> str:
+    return "test-collection"
