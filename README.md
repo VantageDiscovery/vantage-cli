@@ -1,3 +1,5 @@
+<img src="assets/vantage_logo.png" title="Vantage Discovery Logo" width="300"/></br>
+
 # vantage-cli
 
 CLI application for accessing Vantage API. Application is implemented using Python, and [Vantage Python SDK](https://github.com/VantageDiscovery/vantage-sdk-python/)
@@ -64,8 +66,6 @@ Options:
                                   collection afterwards.
   --help                          Show this message and exit.
 ```
-
-Each command has extensive help available, so give it a go.
 
 ## Configuration
 
@@ -135,7 +135,7 @@ It will be the same as you've ran:
 ./cli.py semantic-search --collection-id example-collection --accuracy 0.4 lamp
 ```
 
-Note that you can override options from `general.search` section by adding new section for a specific search command, with the overriden option:
+> Note that you can override options from `general.search` section by adding new section for a specific search command, with the overriden option:
 
 ```ini
 [general.search]
