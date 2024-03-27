@@ -73,7 +73,7 @@ def configuration_callback(ctx: click.core.Context, param, filename):
 
     if not config_loader.file_exists():
         click.echo("It seems that you have no config file. Running wizard...")
-        initial_configuration_propmpt(config_loader=config_loader)
+        initial_configuration_prompt(config_loader=config_loader)
 
     if config_loader.file_exists():
         config = config_loader.load()
@@ -101,18 +101,28 @@ def configuration_callback(ctx: click.core.Context, param, filename):
         ctx.default_map = general_config
 
 
-def initial_configuration_propmpt(config_loader: ConfigLoader) -> None:
-    client_id = click.prompt("Please enter Client ID", type=str)
-    client_secret = click.prompt("Please enter Client Secret", type=str)
-    api_key = click.prompt("Please enter API key", type=str)
+def initial_configuration_prompt(config_loader: ConfigLoader) -> None:
+    account_id = click.prompt(
+        "Please enter Account ID (https://console.vanta.ge/account)", type=str
+    )
+    client_id = click.prompt(
+        "Please enter Client ID (https://console.vanta.ge/account)", type=str
+    )
+    client_secret = click.prompt(
+        "Please enter Client Secret (https://console.vanta.ge/account)",
+        type=str,
+    )
+    api_key = click.prompt(
+        "Please enter Vantage API key (https://console.vanta.ge/api)", type=str
+    )
 
     config_loader.initialize_file()
     config = config_loader.load()
     config.add_section(GENERAL_SECTION)
-    config.add_section(SEARCH_SECTION)
+    config.set(GENERAL_SECTION, "account_id", account_id)
     config.set(GENERAL_SECTION, "client_id", client_id)
     config.set(GENERAL_SECTION, "client_secret", client_secret)
-    config.set(SEARCH_SECTION, "vantage_api_key", api_key)
+    config.set(GENERAL_SECTION, "vantage_api_key", api_key)
     with open(config_loader.path, "w") as file:
         config.write(file, space_around_delimiters=True)
         file.close()

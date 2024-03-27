@@ -8,7 +8,7 @@ from vantage_cli.commands.util import CommandExecutor
 
 
 def _upload_parquet(
-    client,
+    client: VantageClient,
     collection_id: str,
     content: bytes,
     file_size: int,
@@ -34,7 +34,10 @@ def _upload_parquet(
 
 
 def _upload_documents(
-    client: VantageClient, collection_id, batch_identifier, documents_file
+    client: VantageClient,
+    collection_id: str,
+    batch_identifier: str,
+    documents_file,
 ) -> str:
     response = client.upload_documents_from_jsonl(
         collection_id=collection_id,
@@ -70,7 +73,7 @@ def _upload_documents(
 @click.pass_obj
 def upload_parquet(ctx, collection_id, parquet_file):
     """
-    Upload embeddings from Parquet file.
+    Uploads embeddings from Parquet file.
 
     DOCUMENTS_FILE is a file containing documents in Parquet format.
     It can be passed as a path to a file, or it can be read from stdin.
@@ -128,7 +131,7 @@ def upload_parquet(ctx, collection_id, parquet_file):
 @click.pass_obj
 def upload_documents(ctx, collection_id, documents_file, batch_identifier):
     """
-    Upload embeddings from JSONL file.
+    Uploads documents from JSONL file.
 
     DOCUMENTS_FILE is a file containing documents in JSONL format.
     It can be passed as a path to a file, or it can be read from stdin.
