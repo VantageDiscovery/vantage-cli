@@ -13,19 +13,19 @@ from vantage_cli.commands.util import (
 
 # Used to pass API key from configuration.
 COMMAND_NAMES = [
-    "embedding-search",
-    "semantic-search",
-    "more-like-this-search",
-    "more-like-these-search",
+    "search-embedding",
+    "search-semantic",
+    "search-more-like-this",
+    "search-more-like-these",
 ]
 
 
-@click.command("embedding-search")
+@click.command("search-embedding")
 @click.option(
-    "--collection-id",
+    "--embedding",
     type=click.STRING,
     required=True,
-    help="Collection ID.",
+    help="Embedding query vector.",
 )
 @click.option(
     "--vantage-api-key",
@@ -36,8 +36,8 @@ COMMAND_NAMES = [
 @click.option(
     "--accuracy",
     type=click.FLOAT,
-    help="Search accuracy.",
     required=False,
+    help="Search accuracy.",
 )
 @click.option(
     "--page",
@@ -58,7 +58,7 @@ COMMAND_NAMES = [
     help="Search filter.",
 )
 @click.argument(
-    "embedding",
+    "collection_id",
     type=click.STRING,
     required=True,
 )
@@ -66,14 +66,14 @@ COMMAND_NAMES = [
 def embedding_search(
     ctx,
     embedding,
-    collection_id,
     accuracy,
     page,
     items_per_page,
     boolean_filter,
     vantage_api_key,
+    collection_id,
 ):
-    """Search using provided embeddings."""
+    """Search based on the provided embedding vector."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
@@ -101,12 +101,12 @@ def embedding_search(
     )
 
 
-@click.command("semantic-search")
+@click.command("search-semantic")
 @click.option(
-    "--collection-id",
+    "--text",
     type=click.STRING,
     required=True,
-    help="Collection ID.",
+    help="Text query.",
 )
 @click.option(
     "--vantage-api-key",
@@ -139,22 +139,22 @@ def embedding_search(
     help="Search filter.",
 )
 @click.argument(
-    "text",
+    "collection_id",
     type=click.STRING,
     required=True,
 )
 @click.pass_obj
 def semantic_search(
     ctx,
-    collection_id,
+    text,
     accuracy,
     page,
     items_per_page,
     boolean_filter,
     vantage_api_key,
-    text,
+    collection_id,
 ):
-    """Search using text."""
+    """Search based on the provided text query."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
@@ -182,94 +182,12 @@ def semantic_search(
     )
 
 
-@click.command("more-like-this-search")
+@click.command("search-more-like-this")
 @click.option(
-    "--document-id",
+    "--document_id",
     type=click.STRING,
     required=True,
     help="ID of a document in a collection.",
-)
-@click.option(
-    "--collection-id",
-    type=click.STRING,
-    required=True,
-    help="Collection ID.",
-)
-@click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
-)
-@click.option(
-    "--accuracy",
-    type=click.FLOAT,
-    required=False,
-    help="Search accuracy.",
-)
-@click.option(
-    "--page",
-    type=click.INT,
-    required=False,
-    help="Search page.",
-)
-@click.option(
-    "--items-per-page",
-    type=click.INT,
-    required=False,
-    help="Items returned per search page.",
-)
-@click.option(
-    "--boolean-filter",
-    type=click.STRING,
-    required=False,
-    help="Search filter.",
-)
-@click.pass_obj
-def more_like_this_search(
-    ctx,
-    document_id,
-    collection_id,
-    accuracy,
-    page,
-    items_per_page,
-    boolean_filter,
-    vantage_api_key,
-):
-    """Finds more like this."""
-    client: VantageClient = ctx["client"]
-    printer: Printer = ctx["printer"]
-    executor: CommandExecutor = ctx["executor"]
-
-    executor.execute_and_print_output(
-        command=lambda: [
-            item.__dict__
-            for item in client.more_like_this_search(
-                accuracy=accuracy,
-                document_id=document_id,
-                collection_id=collection_id,
-                page=page,
-                page_count=items_per_page,
-                boolean_filter=boolean_filter,
-                vantage_api_key=vantage_api_key,
-            ).results
-        ],
-        output_type=ContentType.OBJECT,
-        printer=printer,
-        exception_handler=lambda exception: specific_exception_handler(
-            exception=exception,
-            class_type=VantageNotFoundError,
-            message="Collection not found.",
-        ),
-    )
-
-
-@click.command("more-like-these-search")
-@click.option(
-    "--collection-id",
-    type=click.STRING,
-    required=True,
-    help="Collection ID.",
 )
 @click.option(
     "--vantage-api-key",
@@ -302,27 +220,105 @@ def more_like_this_search(
     help="Search filter.",
 )
 @click.argument(
-    "more-like-these-json",
-    type=click.File('r'),
-    default=sys.stdin,
+    "collection_id",
+    type=click.STRING,
     required=True,
 )
 @click.pass_obj
-def more_like_these_search(
+def more_like_this_search(
     ctx,
-    collection_id,
+    document_id,
     accuracy,
     page,
     items_per_page,
     boolean_filter,
     vantage_api_key,
+    collection_id,
+):
+    """Search based on the provided document ID."""
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor: CommandExecutor = ctx["executor"]
+
+    executor.execute_and_print_output(
+        command=lambda: [
+            item.__dict__
+            for item in client.more_like_this_search(
+                accuracy=accuracy,
+                document_id=document_id,
+                collection_id=collection_id,
+                page=page,
+                page_count=items_per_page,
+                boolean_filter=boolean_filter,
+                vantage_api_key=vantage_api_key,
+            ).results
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Collection not found.",
+        ),
+    )
+
+
+@click.command("search-more-like-these")
+@click.option(
+    "--more-like-these-json",
+    type=click.File('r'),
+    default=sys.stdin,
+    required=True,
+    help="Path to the JSON file containing a list of `these` objects.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
+)
+@click.option(
+    "--accuracy",
+    type=click.FLOAT,
+    required=False,
+    help="Search accuracy.",
+)
+@click.option(
+    "--page",
+    type=click.INT,
+    required=False,
+    help="Search page.",
+)
+@click.option(
+    "--items-per-page",
+    type=click.INT,
+    required=False,
+    help="Items returned per search page.",
+)
+@click.option(
+    "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
+)
+@click.pass_obj
+def more_like_these_search(
+    ctx,
     more_like_these_json,
+    accuracy,
+    page,
+    items_per_page,
+    boolean_filter,
+    vantage_api_key,
+    collection_id,
 ):
     """
-    Finds more like these.
-
-    MORE_LIKE_THESE_JSON is a .json file containing a list of `these` objects.
-    It can be passed as a path to a file, or it can be read from stdin.
+    Search based on the provided MoreLikeThese items.
     """
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]

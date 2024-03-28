@@ -16,24 +16,31 @@ def get_account(ctx):
         command=lambda: client.get_account().__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=VantageNotFoundError,
+            message="Account not found.",
+        ),
     )
 
 
 @click.command("update-account")
 @click.argument(
-    "name",
+    "new_account_name",
     type=click.STRING,
     required=True,
 )
 @click.pass_obj
-def update_account(ctx, name):
-    """Updates details of a vantage account."""
+def update_account(ctx, new_account_name):
+    """Updates details of a Vantage account."""
     client = ctx["client"]
     printer = ctx["printer"]
     executor = ctx["executor"]
 
     executor.execute_and_print_output(
-        command=lambda: client.update_account(account_name=name).__dict__,
+        command=lambda: client.update_account(
+            account_name=new_account_name
+        ).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(

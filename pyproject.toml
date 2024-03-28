@@ -15,6 +15,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.12"
+pydantic = ">=2"
 click = "8.1.7"
 vantage-sdk = ">= 0.0.12"
 black  = { version = "^23.0", optional = true}
@@ -36,6 +37,9 @@ mkdocs = {version = "^1.5.3", optional = true}
 mkdocs-material = {version = "^9.5.3", optional = true}
 mkdocs-include-markdown-plugin = {version = "^4.0.0", optional = true}
 jsonpickle = ">= 3.0"
+requests = ">=2, <3"
+urllib3 = ">=2, <3"
+python-dateutil = ">=2, <3"
 
 [tool.poetry.extras]
 test = [

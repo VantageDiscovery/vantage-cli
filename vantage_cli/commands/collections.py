@@ -43,32 +43,38 @@ def list_collections(ctx):
     "--embeddings-dimension",
     type=click.INT,
     required=True,
-    help="Collecion embedding dimension",
+    help="Dimension of the embeddings stored in the collection.",
+)
+@click.option(
+    "--user-provided-embeddings",
+    type=click.BOOL,
+    required=False,
+    help="If the user is going to provide embeddings, if False, Vantage will manage embedding creation.",
+    default=False,
+)
+@click.option(
+    "--llm",
+    type=click.STRING,
+    required=False,
+    help="Embedding model which will be used for embedding creation. Required if user_provided_embeddings is False.",
 )
 @click.option(
     "--llm-provider",
     type=click.STRING,
     required=False,
-    help="LLM provider ID (\"OpenAPI\"|\"Hugging\")",
+    help="LLM provider ID supported by Vantage (\"OpenAPI\"|\"Hugging\"). Required if user_provided_embeddings is False.",
 )
 @click.option(
     "--external-key-id",
     type=click.STRING,
     required=False,
-    help="Key for the external API",
+    help="External API key ID. Required if user_provided_embeddings is False.",
 )
 @click.option(
     "--collection-preview-url-pattern",
     type=click.STRING,
     required=False,
-    help="URL pattern for previewing items in the collection",
-)
-@click.option(
-    "--use-provided-embeddings",
-    type=click.BOOL,
-    required=False,
-    help="If the user will upload embeddings to collection afterwards.",
-    default=False,
+    help="URL pattern for previewing items in the collection.",
 )
 @click.pass_obj
 def create_collection(
@@ -76,10 +82,11 @@ def create_collection(
     collection_id,
     collection_name,
     embeddings_dimension,
+    user_provided_embeddings,
+    llm,
     llm_provider,
     external_key_id,
     collection_preview_url_pattern,
-    use_provided_embeddings,
 ):
     """Creates a new collection."""
     client: VantageClient = ctx["client"]
@@ -95,8 +102,9 @@ def create_collection(
             collection_id=collection_id,
             collection_name=collection_name,
             embeddings_dimension=embeddings_dimension,
-            user_provided_embeddings=use_provided_embeddings,
-            llm=llm_provider,
+            user_provided_embeddings=user_provided_embeddings,
+            llm=llm,
+            llm_provider=llm_provider,
             external_key_id=external_key_id,
             collection_preview_url_pattern=collection_preview_url_pattern,
         ).__dict__,
@@ -132,36 +140,35 @@ def get_collection(ctx, collection_id):
 
 @click.command("update-collection")
 @click.option(
-    "--collection-id",
-    type=click.STRING,
-    required=True,
-    help="ID for the new collection.",
-)
-@click.option(
     "--collection-name",
     type=click.STRING,
     required=False,
-    help="Name for the new collection.",
+    help="New name for the collection.",
 )
 @click.option(
     "--external-key-id",
     type=click.STRING,
     required=False,
-    help="Key for the external API",
+    help="New external key ID used in the collection.",
 )
 @click.option(
     "--collection-preview-url-pattern",
     type=click.STRING,
     required=False,
-    help="URL pattern for previewing items in the collection",
+    help="New URL pattern for previewing items in the collection",
+)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
 )
 @click.pass_obj
 def update_collection(
     ctx,
-    collection_id,
     collection_name,
     external_key_id,
     collection_preview_url_pattern,
+    collection_id,
 ):
     """Updates collection data."""
     client: VantageClient = ctx["client"]
