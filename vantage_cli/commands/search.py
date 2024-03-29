@@ -57,6 +57,24 @@ COMMAND_NAMES = [
     required=False,
     help="Search filter.",
 )
+@click.option(
+    "--sort-field",
+    type=click.STRING,
+    required=False,
+    help="Sorting field.",
+)
+@click.option(
+    "--sort-order",
+    type=click.STRING,
+    required=False,
+    help="Sorting order. Supported values (\"asc\"|\"desc\").",
+)
+@click.option(
+    "--sort-mode",
+    type=click.STRING,
+    required=False,
+    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -70,6 +88,9 @@ def embedding_search(
     page,
     items_per_page,
     boolean_filter,
+    sort_field,
+    sort_order,
+    sort_mode,
     vantage_api_key,
     collection_id,
 ):
@@ -88,6 +109,9 @@ def embedding_search(
                 page=page,
                 page_count=items_per_page,
                 boolean_filter=boolean_filter,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                sort_mode=sort_mode,
                 vantage_api_key=vantage_api_key,
             ).results
         ],
@@ -138,6 +162,24 @@ def embedding_search(
     required=False,
     help="Search filter.",
 )
+@click.option(
+    "--sort-field",
+    type=click.STRING,
+    required=False,
+    help="Sorting field.",
+)
+@click.option(
+    "--sort-order",
+    type=click.STRING,
+    required=False,
+    help="Sorting order. Supported values (\"asc\"|\"desc\").",
+)
+@click.option(
+    "--sort-mode",
+    type=click.STRING,
+    required=False,
+    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -147,11 +189,14 @@ def embedding_search(
 def semantic_search(
     ctx,
     text,
+    vantage_api_key,
     accuracy,
     page,
     items_per_page,
     boolean_filter,
-    vantage_api_key,
+    sort_field,
+    sort_order,
+    sort_mode,
     collection_id,
 ):
     """Search based on the provided text query."""
@@ -169,6 +214,9 @@ def semantic_search(
                 page=page,
                 page_count=items_per_page,
                 boolean_filter=boolean_filter,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                sort_mode=sort_mode,
                 vantage_api_key=vantage_api_key,
             ).results
         ],
@@ -219,6 +267,24 @@ def semantic_search(
     required=False,
     help="Search filter.",
 )
+@click.option(
+    "--sort-field",
+    type=click.STRING,
+    required=False,
+    help="Sorting field.",
+)
+@click.option(
+    "--sort-order",
+    type=click.STRING,
+    required=False,
+    help="Sorting order. Supported values (\"asc\"|\"desc\").",
+)
+@click.option(
+    "--sort-mode",
+    type=click.STRING,
+    required=False,
+    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -232,6 +298,9 @@ def more_like_this_search(
     page,
     items_per_page,
     boolean_filter,
+    sort_field,
+    sort_order,
+    sort_mode,
     vantage_api_key,
     collection_id,
 ):
@@ -250,6 +319,9 @@ def more_like_this_search(
                 page=page,
                 page_count=items_per_page,
                 boolean_filter=boolean_filter,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                sort_mode=sort_mode,
                 vantage_api_key=vantage_api_key,
             ).results
         ],
@@ -301,6 +373,24 @@ def more_like_this_search(
     required=False,
     help="Search filter.",
 )
+@click.option(
+    "--sort-field",
+    type=click.STRING,
+    required=False,
+    help="Sorting field.",
+)
+@click.option(
+    "--sort-order",
+    type=click.STRING,
+    required=False,
+    help="Sorting order. Supported values (\"asc\"|\"desc\").",
+)
+@click.option(
+    "--sort-mode",
+    type=click.STRING,
+    required=False,
+    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -314,6 +404,9 @@ def more_like_these_search(
     page,
     items_per_page,
     boolean_filter,
+    sort_field,
+    sort_order,
+    sort_mode,
     vantage_api_key,
     collection_id,
 ):
@@ -344,6 +437,9 @@ def more_like_these_search(
                 page=page,
                 page_count=items_per_page,
                 boolean_filter=boolean_filter,
+                sort_field=sort_field,
+                sort_order=sort_order,
+                sort_mode=sort_mode,
                 vantage_api_key=vantage_api_key,
                 more_like_these=more_like_these,
             ).results
