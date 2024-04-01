@@ -39,6 +39,16 @@ DEFAULT_API_HOST = "https://api.stage-a.dev.vantagediscovery.com"
 DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
 
 
+def create_client_from_vantage_api_key(
+    vantage_api_key: str, account_id: str, api_host: str
+):
+    return VantageClient.using_vantage_api_key(
+        vantage_api_key=vantage_api_key,
+        api_host=api_host,
+        account_id=account_id,
+    )
+
+
 def create_client_from_jwt(jwt_token: str, account_id: str, api_host: str):
     return VantageClient.using_jwt_token(
         vantage_api_jwt_token=jwt_token,
@@ -95,6 +105,15 @@ def create_executor(debug: bool):
     help="Print debug info for errors returned by API.",
 )
 @click.option(
+    "-k",
+    "--vantage-api-key",
+    envvar="VANTAGE_API_KEY",
+    type=click.STRING,
+    default=None,
+    required=False,
+    help="Vantage API key for accessing API.",
+)
+@click.option(
     "-t",
     "--jwt-token",
     envvar="VANTAGE_API_JWT_TOKEN",
@@ -144,6 +163,7 @@ def create_executor(debug: bool):
 def cli(
     ctx,
     account_id,
+    vantage_api_key,
     jwt_token,
     output_type,
     debug_errors,
@@ -163,11 +183,19 @@ def cli(
 
     client = None
 
-    if jwt_token is not None:
-        client = create_client_from_jwt(
-            jwt_token=jwt_token, account_id=account_id, api_host=api_host
+    if vantage_api_key:
+        client = create_client_from_vantage_api_key(
+            vantage_api_key=vantage_api_key,
+            account_id=account_id,
+            api_host=api_host,
         )
-    elif client_id is not None and client_secret is not None:
+    elif jwt_token:
+        client = create_client_from_jwt(
+            jwt_token=jwt_token,
+            account_id=account_id,
+            api_host=api_host,
+        )
+    elif client_id and client_secret:
         client = create_client_from_credentials(
             account_id=account_id,
             client_id=client_id,
@@ -178,7 +206,7 @@ def cli(
 
     if client is None:
         click.echo(
-            "Either JWT token or client ID and secret need to be specified."
+            "Either Vantage API ket, JWT token or client ID and secret need to be specified."
         )
         exit(127)
 
