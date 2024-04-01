@@ -37,6 +37,7 @@ COMMAND_NAMES = [
     "--accuracy",
     type=click.FLOAT,
     required=False,
+    default=0.3,
     help="Search accuracy.",
 )
 @click.option(
@@ -142,6 +143,7 @@ def embedding_search(
     "--accuracy",
     type=click.FLOAT,
     required=False,
+    default=0.3,
     help="Search accuracy.",
 )
 @click.option(
@@ -247,6 +249,7 @@ def semantic_search(
     "--accuracy",
     type=click.FLOAT,
     required=False,
+    default=0.3,
     help="Search accuracy.",
 )
 @click.option(
@@ -353,6 +356,7 @@ def more_like_this_search(
     "--accuracy",
     type=click.FLOAT,
     required=False,
+    default=0.3,
     help="Search accuracy.",
 )
 @click.option(
