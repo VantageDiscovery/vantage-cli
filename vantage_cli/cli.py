@@ -105,7 +105,7 @@ def create_executor(debug: bool):
     help="Print debug info for errors returned by API.",
 )
 @click.option(
-    "-v",
+    "-k",
     "--vantage-api-key",
     envvar="VANTAGE_API_KEY",
     type=click.STRING,
