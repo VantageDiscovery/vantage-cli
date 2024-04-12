@@ -2,6 +2,7 @@
 
 """Console script for vantage_cli."""
 
+import sys
 import click
 from vantage_cli.commands.account import get_account, update_account
 from vantage_cli.commands.api_keys import (
@@ -188,13 +189,13 @@ def cli(
         import vantage_cli
 
         click.echo(vantage_cli.__version__)
-        exit(0)
+        sys.exit(0)
 
     if ctx.invoked_subcommand is None:
         click.echo(
             f"No command specified. Run {ctx.info_name} --help for help."
         )
-        exit(1)
+        sys.exit(1)
 
     client = None
 
