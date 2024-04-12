@@ -20,7 +20,8 @@ CLI supports all of the Vantage API endpoints: account management, collections m
 ## Building binary using pyinstaller
 
 1. Run `poetry install --all-extras` in the root of the directory
-2. Run `pyinstaller vantage_cli/vantage.py`
+2. Deactivate and activate your virtual environment (`pyenv deactivate`, `pyenv activate <env name>`)
+3. Run `pyinstaller vantage_cli/vantage.py`
 
 Binary named `vantage` will be built in the `vantage_cli/dist/vantage` directory.
 
