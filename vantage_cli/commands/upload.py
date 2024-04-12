@@ -1,7 +1,7 @@
 import os
 import sys
 import click
-from vantage import VantageClient
+from vantage_sdk import VantageClient
 from vantage_cli.printer import Printer, ContentType, Printable
 import uuid
 from vantage_cli.commands.util import CommandExecutor

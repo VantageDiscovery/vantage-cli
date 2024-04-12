@@ -1,26 +1,22 @@
 from typing import Callable, Optional, Type
 from vantage_cli.printer import Printable, ContentType, Printer
 import traceback
-from vantage.exceptions import (
-    VantageForbiddenError,
-    VantageInvalidRequestError,
-    VantageInvalidResponseError,
-    VantageNotFoundError,
-    VantageServiceError,
-    VantageUnauthorizedError,
+from vantage_sdk.core.http.exceptions import (
+    BadRequestException,
+    ForbiddenException,
+    NotFoundException,
+    OpenApiException,
 )
-from vantage.model.search import MoreLikeTheseItem
+from vantage_sdk.model.search import MoreLikeTheseItem
 import jsonpickle
 
 
 class CommandExecutor:
     EXCEPTION_MESSAGES = {
-        VantageInvalidRequestError: "Invalid request sent.",
-        VantageForbiddenError: "Access denied. You are not authorized to perform this action.",
-        VantageInvalidResponseError: "Service error, server returned erroneous response.",
-        VantageNotFoundError: "Resource not found.",
-        VantageUnauthorizedError: "Unauthorized. Check your credentials.",
-        VantageServiceError: "Unknown error ocurred.",
+        BadRequestException: "Invalid request sent.",
+        ForbiddenException: "Access denied. You are not authorized to perform this action.",
+        OpenApiException: "Service error, server returned erroneous response.",
+        NotFoundException: "Resource not found.",
     }
 
     def __init__(self, debug_exceptions: bool = False):

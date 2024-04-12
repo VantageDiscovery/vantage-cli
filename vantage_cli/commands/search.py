@@ -2,8 +2,8 @@ import sys
 import click
 import jsonpickle
 from vantage_cli.commands.util import parse_more_like_these
-from vantage import VantageClient
-from vantage.exceptions import VantageNotFoundError
+from vantage_sdk.client import VantageClient
+from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.printer import Printer, Printable, ContentType
 from vantage_cli.commands.util import (
     specific_exception_handler,
@@ -120,7 +120,7 @@ def embedding_search(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )
@@ -226,7 +226,7 @@ def semantic_search(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )
@@ -332,7 +332,7 @@ def more_like_this_search(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )
@@ -452,7 +452,7 @@ def more_like_these_search(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )

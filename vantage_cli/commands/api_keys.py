@@ -1,7 +1,7 @@
 import click
 from vantage_cli.printer import ContentType, Printer
-from vantage import VantageClient
-from vantage.exceptions import VantageNotFoundError
+from vantage_sdk.client import VantageClient
+from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.commands.util import specific_exception_handler
 
 
@@ -43,7 +43,7 @@ def get_vantage_api_key(ctx, vantage_api_key_id):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Vantage API key not found.",
         ),
     )
@@ -124,7 +124,7 @@ def get_external_api_key(ctx, external_key_id):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="External API key not found.",
         ),
     )
@@ -174,7 +174,7 @@ def update_external_api_key(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="External API key not found.",
         ),
     )
@@ -201,7 +201,7 @@ def delete_external_api_key(ctx, external_key_id):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="External API key not found.",
         ),
     )

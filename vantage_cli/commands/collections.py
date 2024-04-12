@@ -1,6 +1,6 @@
 import click
-from vantage import VantageClient
-from vantage.exceptions import VantageNotFoundError
+from vantage_sdk.client import VantageClient
+from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.commands.util import specific_exception_handler
 from vantage_cli.printer import Printer, ContentType
 
@@ -132,7 +132,7 @@ def get_collection(ctx, collection_id):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )
@@ -186,7 +186,7 @@ def update_collection(
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )
@@ -211,7 +211,7 @@ def delete_collection(ctx, collection_id):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Collection not found.",
         ),
     )

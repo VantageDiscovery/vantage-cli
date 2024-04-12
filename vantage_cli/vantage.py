@@ -28,7 +28,7 @@ from vantage_cli.commands.search import (
     semantic_search,
 )
 from vantage_cli.printer import create_printer
-from vantage import VantageClient
+from vantage_sdk.client import VantageClient
 from vantage_cli.commands.util import CommandExecutor
 from vantage_cli.config import (
     default_config_file,
@@ -159,6 +159,14 @@ def create_executor(debug: bool):
     default=DEFAULT_AUTH_HOST,
     help="Specify non-default auth host (used for development).",
 )
+@click.option(
+    "-v",
+    "--version",
+    type=click.BOOL,
+    default=False,
+    is_flag=True,
+    help="Print application version.",
+)
 @click.pass_context
 def cli(
     ctx,
@@ -172,14 +180,21 @@ def cli(
     client_id,
     client_secret,
     config_file,
+    version,
 ):
+    ctx.ensure_object(dict)
+
+    if version:
+        import vantage_cli
+
+        click.echo(vantage_cli.__version__)
+        exit(0)
+
     if ctx.invoked_subcommand is None:
         click.echo(
             f"No command specified. Run {ctx.info_name} --help for help."
         )
         exit(1)
-
-    ctx.ensure_object(dict)
 
     client = None
 

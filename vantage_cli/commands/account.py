@@ -1,6 +1,6 @@
 import click
 from vantage_cli.printer import ContentType
-from vantage.exceptions import VantageNotFoundError
+from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.commands.util import specific_exception_handler
 
 
@@ -18,7 +18,7 @@ def get_account(ctx):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Account not found.",
         ),
     )
@@ -45,7 +45,7 @@ def update_account(ctx, new_account_name):
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
             exception=exception,
-            class_type=VantageNotFoundError,
+            class_type=NotFoundException,
             message="Account not found.",
         ),
     )
