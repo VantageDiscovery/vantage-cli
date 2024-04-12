@@ -1,7 +1,7 @@
 [tool]
 [tool.poetry]
 name = "vantage-cli"
-version = "0.0.1"
+version = "0.5.0"
 description = "Vantage CLI application."
 authors = ["Vantage <none@vantage.com>"]
 readme = "README.md"
@@ -89,13 +89,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [bumpver]
-current_version = "0.0.5"
+current_version = "0.5.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 
 [bumpver.file_patterns]
 "pyproject.toml" = [
     'version = "{version}"',
 ]
-"vantage/__init__.py" = [
+"vantage_cli/__init__.py" = [
     "__version__ = '{version}'",
 ]
