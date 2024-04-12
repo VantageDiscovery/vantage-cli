@@ -14,41 +14,51 @@ CLI supports all of the Vantage API endpoints: account management, collections m
 2. Ensure that you have `Python 3.10`, and `poetry` tool installed, either locally, or use virtual environment.
 3. Since we are currently fetching SDK from [test PyPi repository](https://test.pypi.org/project/vantage-sdk/), it is necessary to manually install it:
    1. Run `pip install pydantic==2.6.1 requests urllib3 python-dateutil` to install SDK requirements
-   2. Run `pip install -i https://test.pypi.org/simple/ vantage-sdk==0.0.12` to install SDK.
+   2. Run `pip install -i https://test.pypi.org/simple/ vantage-sdk==0.7.0` to install SDK.
 4. Run `poetry install` in the root of the cli directory.
+
+## Building binary using pyinstaller
+
+1. Run `poetry install --all-extras` in the root of the directory
+2. Deactivate and activate your virtual environment (`pyenv deactivate`, `pyenv activate <env name>`)
+3. Run `pyinstaller vantage_cli/vantage.py`
+
+Binary named `vantage` will be built in the `vantage_cli/dist/vantage` directory.
 
 ## Usage
 
-Enter the `vantage-cli/vantage_cli` directory, and run `./cli.py --help`. CLI will ask you a few questions to create initial configuration file, and then show help.
+If using source, enter the `vantage-cli/vantage_cli` directory, and run `./vantage.py --help`. CLI will ask you a few questions to create initial configuration file, and then show help.
+
+If using binary, copy the binary from `vantage-cli/vantage_cli/dist/vantage` to your PATH, and use `vantage` binary instead of `vantage.py` script.
 
 Generally, CLI usage is like following:
 
 ```bash
-./cli.py [GENRAL_OPTIONS] command [COMMAND_OPTIONS] [COMMAND_ARGUMENTS]
+./vantage.py [GENRAL_OPTIONS] command [COMMAND_OPTIONS] [COMMAND_ARGUMENTS]
 ```
 
 For example:
 
 ```bash
-./cli.py -o csv -a example-account create-collection --collection-id example --collection-name "My example collection" --embeddings-dimension 1536 --use-provided-embeddings true
+./vantage.py -o csv -a example-account create-collection --collection-id example --collection-name "My example collection" --embeddings-dimension 1536 --use-provided-embeddings true
 ```
 
 ### Getting help
 
-Run `cli.py --help` to show available options and commands.
+Run `vantage.py --help` to show available options and commands.
 
-Each command has specific help available, run `./cli.py command --help` to get help for each one of them
+Each command has specific help available, run `./vantage.py command --help` to get help for each one of them
 
 For example, running:
 
 ```bash
-./cli.py create-collection --help
+./vantage.py create-collection --help
 ```
 
 Will output following help text:
 
 ```bash
-Usage: cli.py create-collection [OPTIONS]
+Usage: vantage.py create-collection [OPTIONS]
 
   Creates a new collection.
 
@@ -98,7 +108,7 @@ If no configuration file is present, CLI will ask you for M2M credentials, and A
 Options in the configuration file have the same name as runtime options, except that dash is replaced by underscore:
 
 ```bash
-./cli.py --account-id example
+./vantage.py --account-id example
 ```
 
 Will translate to configuration like this:
@@ -109,7 +119,7 @@ account_id = example
 ```
 
 #### Section `general`
-**general** section contains options passed to the CLI at runtime. You can see the available options by running `./cli.py --help`.
+**general** section contains options passed to the CLI at runtime. You can see the available options by running `./vantage.py --help`.
 
 
 #### Section `general.search`
@@ -126,13 +136,13 @@ accuracy = 0.4
 When running any of the search commands, for example:
 
 ```bash
-./cli.py semantic-search --collection-id example-collection lamp
+./vantage.py semantic-search --collection-id example-collection lamp
 ```
 
 It will be the same as you've ran:
 
 ```bash
-./cli.py semantic-search --collection-id example-collection --accuracy 0.4 lamp
+./vantage.py semantic-search --collection-id example-collection --accuracy 0.4 lamp
 ```
 
 > Note that you can override options from `general.search` section by adding new section for a specific search command, with the overriden option:

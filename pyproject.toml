@@ -40,6 +40,7 @@ jsonpickle = ">= 3.0"
 requests = ">=2, <3"
 urllib3 = ">=2, <3"
 python-dateutil = ">=2, <3"
+pyinstaller = ">=6"
 
 [tool.poetry.extras]
 test = [
@@ -53,7 +54,18 @@ test = [
     ]
 
 
-dev = ["tox", "pre-commit", "virtualenv", "pip", "twine", "toml", "bump2version"]
+dev = [
+    "tox",
+    "pre-commit",
+    "virtualenv",
+    "pip",
+    "twine",
+    "toml",
+    "bump2version",
+    "pyinstaller"
+    ]
+
+
 doc = [
     "mkdocs",
     "mkdocs-material",
