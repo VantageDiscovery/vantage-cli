@@ -12,10 +12,7 @@ CLI supports all of the Vantage API endpoints: account management, collections m
 
 1. Clone this repository using git, or download and unpack [ZIP file](https://github.com/VantageDiscovery/vantage-cli/archive/refs/heads/develop.zip).
 2. Ensure that you have `Python 3.10`, and `poetry` tool installed, either locally, or use virtual environment.
-3. Since we are currently fetching SDK from [test PyPi repository](https://test.pypi.org/project/vantage-sdk/), it is necessary to manually install it:
-   1. Run `pip install pydantic==2.6.1 requests urllib3 python-dateutil` to install SDK requirements
-   2. Run `pip install -i https://test.pypi.org/simple/ vantage-sdk==0.7.0` to install SDK.
-4. Run `poetry install` in the root of the cli directory.
+3. Run `poetry install` in the root of the cli directory.
 
 ## Building binary using pyinstaller
 
