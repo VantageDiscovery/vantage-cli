@@ -21,7 +21,7 @@ from vantage_cli.commands.util import (
     help="List of document IDs to delete.",
 )
 @click.pass_obj
-def delete_documents(ctx, collection_id, document_ids):
+def delete_documents(ctx, collection_id: str, document_ids: str):
     """Deletes documents by ID."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
@@ -29,7 +29,8 @@ def delete_documents(ctx, collection_id, document_ids):
 
     executor.execute_and_print_output(
         command=lambda: client.delete_documents(
-            collection_id=collection_id, document_ids=document_ids
+            collection_id=collection_id,
+            document_ids=document_ids,
         ).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
