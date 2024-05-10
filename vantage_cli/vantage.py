@@ -21,6 +21,7 @@ from vantage_cli.commands.collections import (
     list_collections,
     update_collection,
 )
+from vantage_cli.commands.delete import delete_documents
 from vantage_cli.commands.upload import upload_parquet, upload_documents
 from vantage_cli.commands.search import (
     embedding_search,
@@ -247,6 +248,7 @@ cli.add_command(list_collections)
 cli.add_command(update_collection)
 cli.add_command(upload_parquet)
 cli.add_command(upload_documents)
+cli.add_command(delete_documents)
 cli.add_command(embedding_search)
 cli.add_command(more_like_these_search)
 cli.add_command(more_like_this_search)
