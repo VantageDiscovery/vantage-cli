@@ -18,7 +18,7 @@ from vantage_cli.commands.util import (
     "--document-ids",
     type=click.STRING,
     required=True,
-    help="List of document IDs to delete.",
+    help="IDs of documents to delete, separated by a comma. For example: \"1, 2, 3, 4, 5\".",
 )
 @click.pass_obj
 def delete_documents(ctx, collection_id: str, document_ids: str):
@@ -30,7 +30,7 @@ def delete_documents(ctx, collection_id: str, document_ids: str):
     executor.execute_and_print_output(
         command=lambda: client.delete_documents(
             collection_id=collection_id,
-            document_ids=document_ids,
+            document_ids=document_ids.split(","),
         ).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
