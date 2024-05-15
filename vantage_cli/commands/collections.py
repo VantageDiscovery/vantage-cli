@@ -1,6 +1,13 @@
+import sys
 import click
 from vantage_sdk.client import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
+from vantage_sdk.model.collection import (
+    HuggingFaceCollection,
+    OpenAICollection,
+    UserProvidedEmbeddingsCollection,
+)
+from vantage_sdk.model.keys import SecondaryExternalAccount
 from vantage_cli.commands.util import specific_exception_handler
 from vantage_cli.printer import Printer, ContentType
 
@@ -21,93 +28,6 @@ def list_collections(ctx):
 
     executor.execute_and_print_output(
         command=lambda: [item.__dict__ for item in client.list_collections()],
-        output_type=ContentType.OBJECT,
-        printer=printer,
-    )
-
-
-@click.command("create-collection")
-@click.option(
-    "--collection-id",
-    type=click.STRING,
-    help="ID for the new collection.",
-    required=True,
-)
-@click.option(
-    "--collection-name",
-    type=click.STRING,
-    required=True,
-    help="Name for the new collection.",
-)
-@click.option(
-    "--embeddings-dimension",
-    type=click.INT,
-    required=True,
-    help="Dimension of the embeddings stored in the collection.",
-)
-@click.option(
-    "--user-provided-embeddings",
-    type=click.BOOL,
-    required=False,
-    help="If the user is going to provide embeddings, if False, Vantage will manage embedding creation.",
-    default=False,
-)
-@click.option(
-    "--llm",
-    type=click.STRING,
-    required=False,
-    help="Embedding model which will be used for embedding creation. Required if user_provided_embeddings is False.",
-)
-@click.option(
-    "--llm-provider",
-    type=click.STRING,
-    required=False,
-    help="LLM provider ID supported by Vantage (\"OpenAPI\"|\"Hugging\"). Required if user_provided_embeddings is False.",
-)
-@click.option(
-    "--external-key-id",
-    type=click.STRING,
-    required=False,
-    help="External API key ID. Required if user_provided_embeddings is False.",
-)
-@click.option(
-    "--collection-preview-url-pattern",
-    type=click.STRING,
-    required=False,
-    help="URL pattern for previewing items in the collection.",
-)
-@click.pass_obj
-def create_collection(
-    ctx,
-    collection_id,
-    collection_name,
-    embeddings_dimension,
-    user_provided_embeddings,
-    llm,
-    llm_provider,
-    external_key_id,
-    collection_preview_url_pattern,
-):
-    """Creates a new collection."""
-    client: VantageClient = ctx["client"]
-    printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
-
-    if llm_provider is None or external_key_id is None:
-        llm_provider = None
-        external_key_id = None
-
-    executor.execute_and_print_output(
-        command=lambda: client.create_collection(
-            collection_id=collection_id,
-            collection_name=collection_name,
-            embeddings_dimension=embeddings_dimension,
-            user_provided_embeddings=user_provided_embeddings,
-            llm=llm,
-            llm_provider=llm_provider,
-            external_key_id=external_key_id,
-            collection_preview_url_pattern=collection_preview_url_pattern,
-        ).__dict__,
         output_type=ContentType.OBJECT,
         printer=printer,
     )
@@ -214,4 +134,231 @@ def delete_collection(ctx, collection_id):
             class_type=NotFoundException,
             message="Collection not found.",
         ),
+    )
+
+
+@click.command("create-collection-openai")
+@click.option(
+    "--collection-id",
+    type=click.STRING,
+    help="ID for the new collection.",
+    required=True,
+)
+@click.option(
+    "--collection-name",
+    type=click.STRING,
+    required=True,
+    help="Name for the new collection.",
+)
+@click.option(
+    "--llm-secret",
+    type=click.STRING,
+    required=False,
+    help="OpenAI account secret key.",
+)
+@click.option(
+    "--llm-model-name",
+    type=click.STRING,
+    required=False,
+    default="text-embedding-ada-002",
+    help="OpenAI LLM model name.",
+)
+@click.option(
+    "--external-account-id",
+    type=click.STRING,
+    required=False,
+    help="OpenAI account key ID from Vantage Console.",
+)
+@click.option(
+    "--secondary-external-account-id",
+    type=click.STRING,
+    required=False,
+    multiple=True,
+    help="Secondary external LLM account key ID.",
+)
+@click.option(
+    "--collection-preview-url-pattern",
+    type=click.STRING,
+    required=False,
+    help="URL pattern for previewing items in the collection.",
+)
+@click.option(
+    "--embeddings-dimension",
+    type=click.INT,
+    required=False,
+    default=1536,
+    help="Dimension of the embeddings stored in the collection.",
+)
+@click.pass_obj
+def create_collection_openai(
+    ctx,
+    collection_id,
+    collection_name,
+    llm_secret,
+    llm_model_name,
+    external_account_id,
+    secondary_external_account_id,
+    collection_preview_url_pattern,
+    embeddings_dimension,
+):
+    """Creates a new OpenAI collection."""
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
+
+    secondary_external_accounts = [
+        SecondaryExternalAccount(
+            external_type="OpenAI", external_account_id=ex_id
+        )
+        for ex_id in secondary_external_account_id
+    ]
+
+    collection = OpenAICollection(
+        collection_id=collection_id,
+        collection_name=collection_name,
+        collection_preview_url_pattern=collection_preview_url_pattern,
+        external_account_id=external_account_id,
+        secondary_external_accounts=secondary_external_accounts,
+        llm_secret=llm_secret,
+        llm=llm_model_name,
+        embeddings_dimension=embeddings_dimension,
+    )
+
+    executor.execute_and_print_output(
+        command=lambda: client.create_collection(
+            collection=collection
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+    )
+
+
+@click.command("create-collection-hf")
+@click.option(
+    "--collection-id",
+    type=click.STRING,
+    help="ID for the new collection.",
+    required=True,
+)
+@click.option(
+    "--collection-name",
+    type=click.STRING,
+    required=True,
+    help="Name for the new collection.",
+)
+@click.option(
+    "--llm-secret",
+    type=click.STRING,
+    required=False,
+    help="HuggingFace account secret.",
+)
+@click.option(
+    "--external-account-id",
+    type=click.STRING,
+    required=False,
+    help="HuggingFace account key ID from Vantage Console.",
+)
+@click.option(
+    "--external-url",
+    type=click.STRING,
+    required=False,
+    help="HuggingFace external URL.",
+)
+@click.option(
+    "--collection-preview-url-pattern",
+    type=click.STRING,
+    required=False,
+    help="URL pattern for previewing items in the collection.",
+)
+@click.option(
+    "--embeddings-dimension",
+    type=click.INT,
+    required=False,
+    default=1536,
+    help="Dimension of the embeddings stored in the collection.",
+)
+@click.pass_obj
+def create_collection_hf(
+    ctx,
+    collection_id,
+    collection_name,
+    llm_secret,
+    external_account_id,
+    external_url,
+    collection_preview_url_pattern,
+    embeddings_dimension,
+):
+    """Creates a new HuggingFace collection."""
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
+
+    collection = HuggingFaceCollection(
+        collection_id=collection_id,
+        collection_name=collection_name,
+        collection_preview_url_pattern=collection_preview_url_pattern,
+        external_account_id=external_account_id,
+        embeddings_dimension=embeddings_dimension,
+        external_url=external_url,
+    )
+
+    executor.execute_and_print_output(
+        command=lambda: client.create_collection(
+            collection=collection
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
+    )
+
+
+@click.command("create-collection-upe")
+@click.option(
+    "--collection-id",
+    type=click.STRING,
+    help="ID for the new collection.",
+    required=True,
+)
+@click.option(
+    "--collection-name",
+    type=click.STRING,
+    required=True,
+    help="Name for the new collection.",
+)
+@click.option(
+    "--embeddings-dimension",
+    type=click.INT,
+    required=True,
+    help="Dimension of the embeddings stored in the collection.",
+)
+@click.option(
+    "--collection-preview-url-pattern",
+    type=click.STRING,
+    required=False,
+    help="URL pattern for previewing items in the collection.",
+)
+@click.pass_obj
+def create_collection_upe(
+    ctx,
+    collection_id,
+    collection_name,
+    embeddings_dimension,
+    collection_preview_url_pattern,
+):
+    """Creates a new collection with user provided embeddings."""
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor = ctx["executor"]
+
+    collection = UserProvidedEmbeddingsCollection(
+        collection_id=collection_id,
+        embeddings_dimension=embeddings_dimension,
+        collection_name=collection_name,
+        collection_preview_url_pattern=collection_preview_url_pattern,
+    )
+    executor.execute_and_print_output(
+        command=lambda: client.create_collection(
+            collection=collection
+        ).__dict__,
+        output_type=ContentType.OBJECT,
+        printer=printer,
     )
