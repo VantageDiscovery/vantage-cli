@@ -120,7 +120,7 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
     required=True,
 )
 @click.pass_obj
-def upload_documents_from_jsonl(
+def upsert_documents_from_jsonl(
     ctx,
     collection_id,
     documents_file,
