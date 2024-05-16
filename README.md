@@ -10,17 +10,28 @@ CLI supports all of the Vantage API endpoints: account management, collections m
 
 ## Installation
 
+### Binary
+
+Grab latest binary from our [releases](https://github.com/VantageDiscovery/vantage-cli/releases) page, and extract it into your PATH.
+
+### Building your own binary using pyinstaller
+
+1. Clone this repository using git, or download and unpack [ZIP file](https://github.com/VantageDiscovery/vantage-cli/archive/refs/heads/develop.zip).
+2. Activate your virtual environment (`pyenv activate <env name>`)
+3. Run `poetry install --all-extras` in the root of the directory
+4. Deactivate and activate your virtual environment (`pyenv deactivate`, `pyenv activate <env name>`)
+5. Run `pyinstaller -F vantage_cli/vantage.py`
+
+Binary named `vantage` will be built in the `dist` directory. Copy it into your PATH.
+
+### Source
+
+It is recommended to use a binary, but if for whatever reason you need to use this software from source, you can do it in following way.
+
 1. Clone this repository using git, or download and unpack [ZIP file](https://github.com/VantageDiscovery/vantage-cli/archive/refs/heads/develop.zip).
 2. Ensure that you have `Python 3.10`, and `poetry` tool installed, either locally, or use virtual environment.
 3. Run `poetry install` in the root of the cli directory.
-
-## Building binary using pyinstaller
-
-1. Run `poetry install --all-extras` in the root of the directory
-2. Deactivate and activate your virtual environment (`pyenv deactivate`, `pyenv activate <env name>`)
-3. Run `pyinstaller -F vantage_cli/vantage.py`
-
-Binary named `vantage` will be built in the `dist` directory.
+4. Run `python vantage_sdk/vantage.py` from the root directory.
 
 ## Usage
 
