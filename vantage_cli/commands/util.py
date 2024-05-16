@@ -1,32 +1,25 @@
 from typing import Callable, Optional, Type
 from vantage_cli.printer import Printable, ContentType, Printer
 import traceback
-from vantage_sdk.core.http.exceptions import (
-    BadRequestException,
-    ForbiddenException,
-    NotFoundException,
-    OpenApiException,
-)
 from vantage_sdk.model.search import MoreLikeTheseItem
 import jsonpickle
 
 
 class CommandExecutor:
-    EXCEPTION_MESSAGES = {
-        BadRequestException: "Invalid request sent.",
-        ForbiddenException: "Access denied. You are not authorized to perform this action.",
-        OpenApiException: "Service error, server returned erroneous response.",
-        NotFoundException: "Resource not found.",
-    }
-
     def __init__(self, debug_exceptions: bool = False):
         self.debug_exceptions = debug_exceptions
 
     def get_generic_message_for_exception(self, exception: Exception) -> str:
-        if type(exception) in self.EXCEPTION_MESSAGES:
-            return self.EXCEPTION_MESSAGES[type(exception)]
+        if exception.body:
+            return jsonpickle.loads(exception.body)
+            # return exception.body
+        elif len(exception.args) > 0:
+            text = "\n".join(exception.args)
+            return f"Error: {text}"
+        elif exception.reason:
+            return f"Error: {exception.reason}"
         else:
-            return exception
+            return "Error: Unknown error."
 
     def execute_and_print_output(
         self,

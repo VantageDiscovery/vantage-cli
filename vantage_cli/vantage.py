@@ -15,14 +15,19 @@ from vantage_cli.commands.api_keys import (
     delete_external_api_key,
 )
 from vantage_cli.commands.collections import (
-    create_collection,
+    create_collection_upe,
+    create_collection_openai,
+    create_collection_hf,
     delete_collection,
     get_collection,
     list_collections,
     update_collection,
 )
-from vantage_cli.commands.delete import delete_documents
-from vantage_cli.commands.upload import upload_parquet, upload_documents
+from vantage_cli.commands.documents import (
+    upsert_documents_from_parquet,
+    upsert_documents_from_jsonl,
+    delete_documents,
+)
 from vantage_cli.commands.search import (
     embedding_search,
     more_like_these_search,
@@ -37,8 +42,8 @@ from vantage_cli.config import (
     configuration_callback,
 )
 
-DEFAULT_API_HOST = "https://api.stage-a.dev.vantagediscovery.com"
-DEFAULT_AUTH_HOST = "https://vantage-dev.us.auth0.com"
+DEFAULT_API_HOST = "https://api.vanta.ge"
+DEFAULT_AUTH_HOST = "https://auth.vanta.ge"
 
 
 def create_client_from_vantage_api_key(
@@ -153,12 +158,14 @@ def create_executor(debug: bool):
     "--api-host",
     type=click.STRING,
     default=DEFAULT_API_HOST,
+    envvar="VANTAGE_API_HOST",
     help="Specify non-default API host (used for development).",
 )
 @click.option(
     "--auth-host",
     type=click.STRING,
     default=DEFAULT_AUTH_HOST,
+    envvar="VANTAGE_AUTH_HOST",
     help="Specify non-default auth host (used for development).",
 )
 @click.option(
@@ -241,13 +248,15 @@ cli.add_command(get_external_api_keys)
 cli.add_command(get_external_api_key)
 cli.add_command(update_external_api_key)
 cli.add_command(delete_external_api_key)
-cli.add_command(create_collection)
+cli.add_command(create_collection_upe)
+cli.add_command(create_collection_openai)
+cli.add_command(create_collection_hf)
 cli.add_command(delete_collection)
 cli.add_command(get_collection)
 cli.add_command(list_collections)
 cli.add_command(update_collection)
-cli.add_command(upload_parquet)
-cli.add_command(upload_documents)
+cli.add_command(upsert_documents_from_parquet)
+cli.add_command(upsert_documents_from_jsonl)
 cli.add_command(delete_documents)
 cli.add_command(embedding_search)
 cli.add_command(more_like_these_search)
