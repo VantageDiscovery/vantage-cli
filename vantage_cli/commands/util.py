@@ -10,14 +10,13 @@ class CommandExecutor:
         self.debug_exceptions = debug_exceptions
 
     def get_generic_message_for_exception(self, exception: Exception) -> str:
-        if exception.body:
+        if hasattr(exception, "body") and exception.body is not None:
             return jsonpickle.loads(exception.body)
-            # return exception.body
-        elif len(exception.args) > 0:
+        if hasattr(exception, "reason") and exception.reason is not None:
+            return f"Error: {exception.reason}"
+        elif hasattr(exception, "args") and len(exception.args) > 0:
             text = "\n".join(exception.args)
             return f"Error: {text}"
-        elif exception.reason:
-            return f"Error: {exception.reason}"
         else:
             return "Error: Unknown error."
 
