@@ -6,6 +6,7 @@ from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.commands.util import (
     specific_exception_handler,
     mask_sensitive_string,
+    CommandExecutor,
 )
 
 
@@ -15,7 +16,7 @@ def get_vantage_api_keys(ctx):
     """Lists existing Vantage API keys."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug("Fetching API keys data...")
@@ -39,7 +40,7 @@ def get_vantage_api_key(ctx, vantage_api_key_id):
     """Shows a specific Vantage API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug(
@@ -83,7 +84,7 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
     """Creates a new external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     data = {
@@ -109,7 +110,7 @@ def get_external_api_keys(ctx):
     """Lists existing external API keys."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug("Fetching external API keys...")
@@ -133,7 +134,7 @@ def get_external_api_key(ctx, external_key_id):
     """Shows a specific external API key details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug(f"Fetching details for key with ID: {external_key_id}")
@@ -182,7 +183,7 @@ def update_external_api_key(
     """Updates external API key data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     data = {
@@ -219,7 +220,7 @@ def delete_external_api_key(ctx, external_key_id):
     """Deletes an external API key."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug(f"Deleting external key {external_key_id}.")

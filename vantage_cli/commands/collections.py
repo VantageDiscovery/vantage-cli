@@ -11,6 +11,7 @@ from vantage_sdk.model.keys import SecondaryExternalAccount
 from vantage_cli.commands.util import (
     specific_exception_handler,
     mask_sensitive_string,
+    CommandExecutor,
 )
 from vantage_cli.printer import Printer, ContentType
 
@@ -27,7 +28,7 @@ def list_collections(ctx):
     """Lists existing colections."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug("Listing collections...")
@@ -49,7 +50,7 @@ def get_collection(ctx, collection_id):
     """Fetches collection details."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug(f"Fetching collection with ID {collection_id}")
@@ -100,7 +101,7 @@ def update_collection(
     """Updates collection data."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     data = {
@@ -138,7 +139,7 @@ def delete_collection(ctx, collection_id):
     """Deletes a collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     logger.debug(f"Deleting collection {collection_id}")
@@ -221,7 +222,7 @@ def create_collection_openai(
     """Creates a new OpenAI collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     secondary_external_accounts = [
@@ -323,7 +324,7 @@ def create_collection_hf(
     """Creates a new HuggingFace collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     data = {
@@ -394,7 +395,7 @@ def create_collection_upe(
     """Creates a new collection with user provided embeddings."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
-    executor = ctx["executor"]
+    executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
     data = {
