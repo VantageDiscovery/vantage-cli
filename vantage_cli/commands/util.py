@@ -7,6 +7,9 @@ import jsonpickle
 
 
 def mask_sensitive_string(value: str) -> str:
+    if value is None:
+        return value
+
     if len(value) < 8:
         return "*" * len(value)
 

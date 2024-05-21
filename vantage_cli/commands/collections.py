@@ -170,7 +170,7 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--llm-secret",
     type=click.STRING,
-    required=False,
+    required=True,
     help="OpenAI account secret key.",
 )
 @click.option(
@@ -183,7 +183,7 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--external-account-id",
     type=click.STRING,
-    required=False,
+    required=True,
     help="OpenAI account key ID from Vantage Console.",
 )
 @click.option(

@@ -44,7 +44,7 @@ from vantage_cli.config import (
 import logging
 
 _LOGGER_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s.%(module)s.%(funcName)s:%(lineno)d] %(message)s"
-_LOGGER_DATE_FORMAT = "%d/%b/%Y %H:%M:%S"
+_LOGGER_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 DEFAULT_API_HOST = "https://api.vanta.ge"
 DEFAULT_AUTH_HOST = "https://auth.vanta.ge"
