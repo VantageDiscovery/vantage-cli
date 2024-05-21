@@ -4,7 +4,7 @@ import sys
 import click
 from vantage_sdk import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
-from vantage_cli.printer import Printer, ContentType, Printable
+from vantage_cli.printer import Printer, ContentType
 import uuid
 from vantage_cli.commands.util import (
     CommandExecutor,
@@ -23,15 +23,11 @@ def _upsert_parquet(
     )
 
     if response == 200:
-        return Printable.stdout(
-            content="Successfully sent to processing.",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = "Successfully sent to processing."
     else:
-        return Printable.stderr(
-            content=f"Processing failed with status {response}",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = f"Processing failed with status {response}"
+
+    return {"response": message}
 
 
 def _upsert_jsonl(
@@ -47,15 +43,11 @@ def _upsert_jsonl(
     )
 
     if response is None:
-        return Printable.stdout(
-            content="Successfully sent to processing.",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = "Successfully sent to processing."
     else:
-        return Printable.stderr(
-            content=f"Sending to processing failed with status {response}",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = f"Sending to processing failed with status {response}"
+
+    return {"response": message}
 
 
 @click.command("upsert-documents-from-parquet")
@@ -99,7 +91,7 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
             collection_id=collection_id,
             parquet_file_name=parquet_file,
         ),
-        output_type=ContentType.PLAINTEXT,
+        output_type=ContentType.OBJECT,
         printer=printer,
     )
 
@@ -159,7 +151,7 @@ def upsert_documents_from_jsonl(
             batch_identifier=batch_identifier,
             documents_file=documents_file,
         ),
-        output_type=ContentType.PLAINTEXT,
+        output_type=ContentType.OBJECT,
         printer=printer,
     )
 
