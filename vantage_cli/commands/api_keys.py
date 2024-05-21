@@ -1,8 +1,12 @@
+from logging import Logger
 import click
 from vantage_cli.printer import ContentType, Printer
 from vantage_sdk.client import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
-from vantage_cli.commands.util import specific_exception_handler
+from vantage_cli.commands.util import (
+    specific_exception_handler,
+    mask_sensitive_string,
+)
 
 
 @click.command("get-vantage-api-keys")
@@ -12,7 +16,9 @@ def get_vantage_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug("Fetching API keys data...")
     executor.execute_and_print_output(
         command=lambda: [
             item.__dict__ for item in client.get_vantage_api_keys()
@@ -34,7 +40,11 @@ def get_vantage_api_key(ctx, vantage_api_key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(
+        f"Fetching details for API key ID: {mask_sensitive_string(vantage_api_key_id)}"
+    )
     executor.execute_and_print_output(
         command=lambda: client.get_vantage_api_key(
             vantage_api_key_id=vantage_api_key_id
@@ -74,7 +84,14 @@ def create_external_api_key(ctx, llm_provider, llm_secret, url):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    data = {
+        "llm_provider": llm_provider,
+        "llm_secret": mask_sensitive_string(llm_secret),
+        "url": url,
+    }
+    logger.debug(f"Creating external key with data {data}")
     executor.execute_and_print_output(
         command=lambda: client.create_external_api_key(
             llm_provider=llm_provider,
@@ -93,7 +110,9 @@ def get_external_api_keys(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug("Fetching external API keys...")
     executor.execute_and_print_output(
         command=lambda: [
             item.__dict__ for item in client.get_external_api_keys()
@@ -115,7 +134,9 @@ def get_external_api_key(ctx, external_key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Fetching details for key with ID: {external_key_id}")
     executor.execute_and_print_output(
         command=lambda: client.get_external_api_key(
             external_key_id=external_key_id
@@ -162,7 +183,14 @@ def update_external_api_key(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    data = {
+        "llm_provider": llm_provider,
+        "llm_secret": mask_sensitive_string(llm_secret),
+        "url": url,
+    }
+    logger.debug(f"Updating external key {external_key_id} with data: {data}")
     executor.execute_and_print_output(
         command=lambda: client.update_external_api_key(
             external_key_id=external_key_id,
@@ -192,7 +220,9 @@ def delete_external_api_key(ctx, external_key_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Deleting external key {external_key_id}.")
     executor.execute_and_print_output(
         command=lambda: client.delete_external_api_key(
             external_key_id=external_key_id

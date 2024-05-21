@@ -36,11 +36,15 @@ from vantage_cli.commands.search import (
 )
 from vantage_cli.printer import create_printer
 from vantage_sdk.client import VantageClient
-from vantage_cli.commands.util import CommandExecutor
+from vantage_cli.commands.util import CommandExecutor, mask_sensitive_string
 from vantage_cli.config import (
     default_config_file,
     configuration_callback,
 )
+import logging
+
+_LOGGER_FORMAT = "[%(asctime)s] %(levelname)s [%(name)s.%(module)s.%(funcName)s:%(lineno)d] %(message)s"
+_LOGGER_DATE_FORMAT = "%d/%b/%Y %H:%M:%S"
 
 DEFAULT_API_HOST = "https://api.vanta.ge"
 DEFAULT_AUTH_HOST = "https://auth.vanta.ge"
@@ -80,8 +84,23 @@ def create_client_from_credentials(
     )
 
 
-def create_executor(debug: bool):
-    return CommandExecutor(debug_exceptions=debug)
+def create_executor(debug: bool, logger: logging.Logger):
+    return CommandExecutor(debug=debug, logger=logger)
+
+
+def configure_debug_logger(debug: bool) -> logging.Logger:
+    if debug:
+        level = logging.DEBUG
+    else:
+        level = logging.INFO
+
+    logging.basicConfig(
+        level=level,
+        format=_LOGGER_FORMAT,
+        datefmt=_LOGGER_DATE_FORMAT,
+        stream=sys.stderr,
+    )
+    return logging.getLogger("vantage")
 
 
 @click.group(invoke_without_command=True)
@@ -105,11 +124,11 @@ def create_executor(debug: bool):
 )
 @click.option(
     "-d",
-    "--debug-errors",
+    "--debug",
     type=click.BOOL,
     default=False,
     is_flag=True,
-    help="Print debug info for errors returned by API.",
+    help="Print execution debug info.",
 )
 @click.option(
     "-k",
@@ -183,7 +202,7 @@ def cli(
     vantage_api_key,
     jwt_token,
     output_type,
-    debug_errors,
+    debug,
     api_host,
     auth_host,
     client_id,
@@ -192,6 +211,7 @@ def cli(
     version,
 ):
     ctx.ensure_object(dict)
+    logger = configure_debug_logger(debug)
 
     if version:
         import vantage_cli
@@ -205,21 +225,31 @@ def cli(
         )
         sys.exit(1)
 
+    logger.debug(f"Invoked command {ctx.invoked_subcommand}")
+    logger.debug(f"Using API host: {api_host}")
+    logger.debug(f"Using account ID: {account_id}")
+
     client = None
 
     if vantage_api_key:
+        logger.debug(
+            f"Creating client using API key: {mask_sensitive_string(vantage_api_key)}"
+        )
         client = create_client_from_vantage_api_key(
             vantage_api_key=vantage_api_key,
             account_id=account_id,
             api_host=api_host,
         )
     elif jwt_token:
+        logger.debug("Creating client using JWT Token.")
         client = create_client_from_jwt(
             jwt_token=jwt_token,
             account_id=account_id,
             api_host=api_host,
         )
     elif client_id and client_secret:
+        logger.debug("Creating client using Client ID/secret pair.")
+        logger.debug(f"Using auth host: {auth_host}")
         client = create_client_from_credentials(
             account_id=account_id,
             client_id=client_id,
@@ -236,7 +266,8 @@ def cli(
 
     ctx.obj["client"] = client
     ctx.obj["printer"] = create_printer(output_type=output_type)
-    ctx.obj["executor"] = create_executor(debug=debug_errors)
+    ctx.obj["executor"] = create_executor(debug=debug, logger=logger)
+    ctx.obj["logger"] = logger
 
 
 cli.add_command(get_account)

@@ -1,3 +1,4 @@
+from logging import Logger
 import os
 import sys
 import click
@@ -80,6 +81,9 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Upserting documents from Parquet file: {parquet_file}")
 
     # NOTE: Batch identifier MUST have a ".parquet" suffix,
     # otherwise service won't process it.
@@ -89,7 +93,7 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
 
     printer.print_text(text=f"Uploading file '{parquet_file}'...")
 
-    executor.execute_and_print_printable(
+    executor.execute_and_print_output(
         command=lambda: _upsert_parquet(
             client=client,
             collection_id=collection_id,
@@ -136,6 +140,9 @@ def upsert_documents_from_jsonl(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Upserting documents from JSONL file: {documents_file}")
     printer.print_text(text="Uploading...")
 
     if batch_identifier is None:
@@ -143,8 +150,9 @@ def upsert_documents_from_jsonl(
             batch_identifier = {str(uuid.uuid4())}
         else:
             batch_identifier = os.path.basename(documents_file.name)
+    logger.debug(f"Batch identifier set to {batch_identifier}")
 
-    executor.execute_and_print_printable(
+    executor.execute_and_print_output(
         command=lambda: _upsert_jsonl(
             client=client,
             collection_id=collection_id,
@@ -174,7 +182,9 @@ def delete_documents(ctx, collection_id: str, document_ids: str):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Deleting documents with IDs: {document_ids}")
     executor.execute_and_print_output(
         command=lambda: client.delete_documents(
             collection_id=collection_id,

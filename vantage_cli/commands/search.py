@@ -1,3 +1,5 @@
+import traceback
+from logging import Logger
 import sys
 import click
 import jsonpickle
@@ -7,6 +9,7 @@ from vantage_sdk.core.http.exceptions import NotFoundException
 from vantage_cli.printer import Printer, Printable, ContentType
 from vantage_cli.commands.util import (
     specific_exception_handler,
+    mask_sensitive_string,
     CommandExecutor,
 )
 
@@ -99,6 +102,21 @@ def embedding_search(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "embedding": embedding,
+        "accuracy": accuracy,
+        "page": page,
+        "items_per_page": items_per_page,
+        "boolean_filter": boolean_filter,
+        "sort_field": sort_field,
+        "sort_order": sort_order,
+        "sort_mode": sort_mode,
+        "vantage_api_key": mask_sensitive_string(vantage_api_key),
+        "collection_id": collection_id,
+    }
+    logger.debug(f"Executing search with data: {data}")
 
     executor.execute_and_print_output(
         command=lambda: [
@@ -205,6 +223,21 @@ def semantic_search(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "text": text,
+        "accuracy": accuracy,
+        "page": page,
+        "items_per_page": items_per_page,
+        "boolean_filter": boolean_filter,
+        "sort_field": sort_field,
+        "sort_order": sort_order,
+        "sort_mode": sort_mode,
+        "vantage_api_key": mask_sensitive_string(vantage_api_key),
+        "collection_id": collection_id,
+    }
+    logger.debug(f"Executing search with data: {data}")
 
     executor.execute_and_print_output(
         command=lambda: [
@@ -311,6 +344,21 @@ def more_like_this_search(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "document_id": document_id,
+        "accuracy": accuracy,
+        "page": page,
+        "items_per_page": items_per_page,
+        "boolean_filter": boolean_filter,
+        "sort_field": sort_field,
+        "sort_order": sort_order,
+        "sort_mode": sort_mode,
+        "vantage_api_key": mask_sensitive_string(vantage_api_key),
+        "collection_id": collection_id,
+    }
+    logger.debug(f"Executing search with data: {data}")
 
     executor.execute_and_print_output(
         command=lambda: [
@@ -420,10 +468,12 @@ def more_like_these_search(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
     try:
         more_like_these = parse_more_like_these(more_like_these_json.read())
     except Exception:
+        logger.debug(traceback.format_exc())
         printer.print(
             Printable.stderr(
                 content="Invalid JSON input",
@@ -431,6 +481,20 @@ def more_like_these_search(
             )
         )
         return
+
+    data = {
+        "more_like_these": more_like_these_json,
+        "accuracy": accuracy,
+        "page": page,
+        "items_per_page": items_per_page,
+        "boolean_filter": boolean_filter,
+        "sort_field": sort_field,
+        "sort_order": sort_order,
+        "sort_mode": sort_mode,
+        "vantage_api_key": mask_sensitive_string(vantage_api_key),
+        "collection_id": collection_id,
+    }
+    logger.debug(f"Executing search with data: {data}")
 
     executor.execute_and_print_output(
         command=lambda: [

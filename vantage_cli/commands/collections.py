@@ -1,4 +1,4 @@
-import sys
+from logging import Logger
 import click
 from vantage_sdk.client import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
@@ -8,7 +8,10 @@ from vantage_sdk.model.collection import (
     UserProvidedEmbeddingsCollection,
 )
 from vantage_sdk.model.keys import SecondaryExternalAccount
-from vantage_cli.commands.util import specific_exception_handler
+from vantage_cli.commands.util import (
+    specific_exception_handler,
+    mask_sensitive_string,
+)
 from vantage_cli.printer import Printer, ContentType
 
 
@@ -25,7 +28,9 @@ def list_collections(ctx):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug("Listing collections...")
     executor.execute_and_print_output(
         command=lambda: [item.__dict__ for item in client.list_collections()],
         output_type=ContentType.OBJECT,
@@ -45,7 +50,9 @@ def get_collection(ctx, collection_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Fetching collection with ID {collection_id}")
     executor.execute_and_print_output(
         lambda: client.get_collection(collection_id=collection_id).__dict__,
         ContentType.OBJECT,
@@ -94,7 +101,15 @@ def update_collection(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    data = {
+        "collection_id": collection_id,
+        "collection_name": collection_name,
+        "external_key_id": mask_sensitive_string(external_key_id),
+        "collection_preview_url_pattern": collection_preview_url_pattern,
+    }
+    logger.debug(f"Updating collection with data: {data}")
     executor.execute_and_print_output(
         lambda: client.update_collection(
             collection_id=collection_id,
@@ -124,7 +139,9 @@ def delete_collection(ctx, collection_id):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Deleting collection {collection_id}")
     executor.execute_and_print_output(
         lambda: _delete_collection(client=client, collection_id=collection_id),
         ContentType.OBJECT,
@@ -205,6 +222,7 @@ def create_collection_openai(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
     secondary_external_accounts = [
         SecondaryExternalAccount(
@@ -212,6 +230,20 @@ def create_collection_openai(
         )
         for ex_id in secondary_external_account_id
     ]
+    data = {
+        "collection_id": collection_id,
+        "collection_name": collection_name,
+        "llm_secret": mask_sensitive_string(llm_secret),
+        "llm_model_name": llm_model_name,
+        "external_account_id": external_account_id,
+        "secondary_external_account_ids": secondary_external_account_id,
+        "collection_preview_url_pattern": collection_preview_url_pattern,
+        "embeddings_dimension": embeddings_dimension,
+    }
+    logger.debug(
+        "Creating new collection using OpenAI for embeddings with data:"
+    )
+    logger.debug(data)
 
     collection = OpenAICollection(
         collection_id=collection_id,
@@ -292,6 +324,21 @@ def create_collection_hf(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "collection_id": collection_id,
+        "collection_name": collection_name,
+        "llm_secret": mask_sensitive_string(llm_secret),
+        "external_url": external_url,
+        "external_account_id": external_account_id,
+        "collection_preview_url_pattern": collection_preview_url_pattern,
+        "embeddings_dimension": embeddings_dimension,
+    }
+    logger.debug(
+        "Creating new collection using HuggingFace for embeddings with data:"
+    )
+    logger.debug(data)
 
     collection = HuggingFaceCollection(
         collection_id=collection_id,
@@ -348,6 +395,18 @@ def create_collection_upe(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "collection_id": collection_id,
+        "collection_name": collection_name,
+        "collection_preview_url_pattern": collection_preview_url_pattern,
+        "embeddings_dimension": embeddings_dimension,
+    }
+    logger.debug(
+        "Creating new collection using user provided embeddings with data::"
+    )
+    logger.debug(data)
 
     collection = UserProvidedEmbeddingsCollection(
         collection_id=collection_id,
