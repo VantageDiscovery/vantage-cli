@@ -404,7 +404,7 @@ def create_collection_upe(
         "embeddings_dimension": embeddings_dimension,
     }
     logger.debug(
-        "Creating new collection using user provided embeddings with data::"
+        "Creating new collection using user provided embeddings with data:"
     )
     logger.debug(data)
 
