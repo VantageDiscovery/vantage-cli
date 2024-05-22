@@ -2,7 +2,7 @@
 
 # vantage-cli
 
-CLI application for accessing Vantage API. Application is implemented using Python, and [Vantage Python SDK](https://github.com/VantageDiscovery/vantage-sdk-python/)
+CLI application for accessing Vantage API. Application is implemented using Python, and [Vantage Python SDK](https://github.com/VantageDiscovery/vantage-sdk-python/).
 
 ## Features
 
@@ -14,12 +14,12 @@ CLI supports all of the Vantage API endpoints: account management, collections m
 
 Grab latest binary from our [releases](https://github.com/VantageDiscovery/vantage-cli/releases) page, and extract it into your PATH.
 
-### Building your own binary using pyinstaller
+### Building your own binary using Pyinstaller
 
 1. Clone this repository using git, or download and unpack [ZIP file](https://github.com/VantageDiscovery/vantage-cli/archive/refs/heads/develop.zip).
-2. Activate your virtual environment (`pyenv activate <env name>`)
+2. Create virtual environment to build the binary *[Optional]*
 3. Run `poetry install --all-extras` in the root of the directory
-4. Deactivate and activate your virtual environment (`pyenv deactivate`, `pyenv activate <env name>`)
+4. Deactivate and activate your virtual environment *[Optional]*
 5. Run `pyinstaller -F vantage_cli/vantage.py`
 
 Binary named `vantage` will be built in the `dist` directory. Copy it into your PATH.
@@ -35,53 +35,52 @@ It is recommended to use a binary, but if for whatever reason you need to use th
 
 ## Usage
 
-If using source, enter the `vantage-cli/vantage_cli` directory, and run `./vantage.py --help`. CLI will ask you a few questions to create initial configuration file, and then show help.
-
-If using binary, copy the binary from `vantage-cli/vantage_cli/dist/vantage` to your PATH, and use `vantage` binary instead of `vantage.py` script.
+If running for the first time, CLI will ask you a few questions to create initial configuration file, and then show help.
 
 Generally, CLI usage is like following:
 
 ```bash
-./vantage.py [GENRAL_OPTIONS] command [COMMAND_OPTIONS] [COMMAND_ARGUMENTS]
+vantage [GENRAL_OPTIONS] command [COMMAND_OPTIONS] [COMMAND_ARGUMENTS]
 ```
 
 For example:
 
 ```bash
-./vantage.py -o csv -a example-account create-collection --collection-id example --collection-name "My example collection" --embeddings-dimension 1536 --use-provided-embeddings true
+vantage -o csv -a example-account create-collection --collection-id example --collection-name "My example collection" --embeddings-dimension 1536 --use-provided-embeddings true
 ```
 
 ### Getting help
 
-Run `vantage.py --help` to show available options and commands.
+Run `vantage --help` to show available options and commands.
 
-Each command has specific help available, run `./vantage.py command --help` to get help for each one of them
+Each command has specific help available, run `vantage command --help` to get help for each one of them
 
 For example, running:
 
 ```bash
-./vantage.py create-collection --help
+vantage create-collection-openai --help
 ```
 
 Will output following help text:
 
-```bash
-Usage: vantage.py create-collection [OPTIONS]
+```text
+Usage: vantage create-collection-openai [OPTIONS]
 
-  Creates a new collection.
+  Creates a new OpenAI collection.
 
 Options:
   --collection-id TEXT            ID for the new collection.  [required]
   --collection-name TEXT          Name for the new collection.  [required]
-  --embeddings-dimension INTEGER  Collecion embedding dimension  [required]
-  --llm-provider TEXT             LLM provider ID ("OpenAPI"|"Hugging")
-  --external-key-id TEXT          Key for the external API
+  --llm-secret TEXT               OpenAI account secret key.
+  --llm-model-name TEXT           OpenAI LLM model name.
+  --external-account-id TEXT      OpenAI account key ID from Vantage Console.
+  --secondary-external-account-id TEXT
+                                  Secondary external LLM account key ID.
   --collection-preview-url-pattern TEXT
                                   URL pattern for previewing items in the
-                                  collection
-  --use-provided-embeddings BOOLEAN
-                                  If the user will upload embeddings to
-                                  collection afterwards.
+                                  collection.
+  --embeddings-dimension INTEGER  Dimension of the embeddings stored in the
+                                  collection.
   --help                          Show this message and exit.
 ```
 
@@ -116,7 +115,7 @@ If no configuration file is present, CLI will ask you for M2M credentials, and A
 Options in the configuration file have the same name as runtime options, except that dash is replaced by underscore:
 
 ```bash
-./vantage.py --account-id example
+vantage --account-id example
 ```
 
 Will translate to configuration like this:
@@ -144,13 +143,13 @@ accuracy = 0.4
 When running any of the search commands, for example:
 
 ```bash
-./vantage.py semantic-search --collection-id example-collection lamp
+vantage semantic-search --collection-id example-collection lamp
 ```
 
 It will be the same as you've ran:
 
 ```bash
-./vantage.py semantic-search --collection-id example-collection --accuracy 0.4 lamp
+vantage semantic-search --collection-id example-collection --accuracy 0.4 lamp
 ```
 
 > Note that you can override options from `general.search` section by adding new section for a specific search command, with the overriden option:
