@@ -84,6 +84,34 @@ Options:
   --help                          Show this message and exit.
 ```
 
+### Debug messages
+
+When running Vantage CLI with `-d` switch, it will print out debug messages to STDERR, which can be useful when troubleshooting issues.
+
+For example, `vantage -d list-collections` will output something like this:
+
+```text
+[2024-05-23 15:49:02] DEBUG [vantage.vantage.cli:228] Invoked command list-collections
+[2024-05-23 15:49:02] DEBUG [vantage.vantage.cli:229] Using API host: https://api.vanta.ge
+[2024-05-23 15:49:02] DEBUG [vantage.vantage.cli:230] Using account ID: test
+[2024-05-23 15:49:02] DEBUG [vantage.vantage.cli:235] Creating client using API key: $2a$********************************************************
+[2024-05-23 15:49:02] DEBUG [vantage.collections.list_collections:34] Listing collections...
+[
+  {
+    "collection_id": "test-collection",
+    "embeddings_dimension": 1536,
+    "user_provided_embeddings": false,
+    "collection_name": "test-collection",
+    "collection_state": "Active",
+    "collection_status": "Online",
+    "collection_created_time": "2024-03-06T10:53:07",
+    "collection_preview_url_pattern": "test/test-collection"
+  }
+]
+```
+
+In case that something goes wrong when running a command, using debug switch will print more details about error that occurred, including stacktrace.
+
 ## Configuration
 
 ### Location
