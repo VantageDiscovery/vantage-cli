@@ -171,8 +171,8 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--llm-secret",
     type=click.STRING,
-    required=True,
-    help="OpenAI account secret key.",
+    required=False,
+    help="OpenAI account secret key (required if no external-account-id provided)",
 )
 @click.option(
     "--llm-model-name",
@@ -184,8 +184,8 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--external-account-id",
     type=click.STRING,
-    required=True,
-    help="OpenAI account key ID from Vantage Console.",
+    required=False,
+    help="OpenAI account key ID (required if no llm-secret provided)",
 )
 @click.option(
     "--secondary-external-account-id",
@@ -283,13 +283,13 @@ def create_collection_openai(
     "--llm-secret",
     type=click.STRING,
     required=False,
-    help="HuggingFace account secret.",
+    help="HuggingFace account secret (required if no external-account-id provided)",.
 )
 @click.option(
     "--external-account-id",
     type=click.STRING,
     required=False,
-    help="HuggingFace account key ID from Vantage Console.",
+    help="HuggingFace account key ID (required if no llm-secret provided)",
 )
 @click.option(
     "--external-url",
