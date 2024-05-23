@@ -31,7 +31,7 @@ It is recommended to use a binary, but if for whatever reason you need to use th
 1. Clone this repository using git, or download and unpack [ZIP file](https://github.com/VantageDiscovery/vantage-cli/archive/refs/heads/develop.zip).
 2. Ensure that you have `Python 3.10`, and `poetry` tool installed, either locally, or use virtual environment.
 3. Run `poetry install` in the root of the cli directory.
-4. Run `python vantage_sdk/vantage.py` from the root directory.
+4. Run `python vantage_cli/vantage.py` from the root directory.
 
 ## Usage
 
