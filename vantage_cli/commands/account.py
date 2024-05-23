@@ -1,16 +1,24 @@
+from logging import Logger
 import click
-from vantage_cli.printer import ContentType
+from vantage_cli.printer import ContentType, Printer
+from vantage_sdk.client import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
-from vantage_cli.commands.util import specific_exception_handler
+from vantage_cli.commands.util import (
+    specific_exception_handler,
+    CommandExecutor,
+)
 
 
 @click.command("get-account")
 @click.pass_obj
 def get_account(ctx):
     """Fetches Vantage account details."""
-    client = ctx["client"]
-    printer = ctx["printer"]
-    executor = ctx["executor"]
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug("Getting account details...")
 
     executor.execute_and_print_output(
         command=lambda: client.get_account().__dict__,
@@ -33,9 +41,12 @@ def get_account(ctx):
 @click.pass_obj
 def update_account(ctx, new_account_name):
     """Updates details of a Vantage account."""
-    client = ctx["client"]
-    printer = ctx["printer"]
-    executor = ctx["executor"]
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Updating account with name: {new_account_name}")
 
     executor.execute_and_print_output(
         command=lambda: client.update_account(

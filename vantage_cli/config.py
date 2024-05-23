@@ -105,13 +105,6 @@ def initial_configuration_prompt(config_loader: ConfigLoader) -> None:
     account_id = click.prompt(
         "Please enter Account ID (https://console.vanta.ge/account)", type=str
     )
-    client_id = click.prompt(
-        "Please enter Client ID (https://console.vanta.ge/account)", type=str
-    )
-    client_secret = click.prompt(
-        "Please enter Client Secret (https://console.vanta.ge/account)",
-        type=str,
-    )
     api_key = click.prompt(
         "Please enter Vantage API key (https://console.vanta.ge/api)", type=str
     )
@@ -120,8 +113,6 @@ def initial_configuration_prompt(config_loader: ConfigLoader) -> None:
     config = config_loader.load()
     config.add_section(GENERAL_SECTION)
     config.set(GENERAL_SECTION, "account_id", account_id)
-    config.set(GENERAL_SECTION, "client_id", client_id)
-    config.set(GENERAL_SECTION, "client_secret", client_secret)
     config.set(GENERAL_SECTION, "vantage_api_key", api_key)
     with open(config_loader.path, "w") as file:
         config.write(file, space_around_delimiters=True)

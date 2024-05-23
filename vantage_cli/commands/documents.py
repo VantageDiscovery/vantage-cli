@@ -1,9 +1,10 @@
+from logging import Logger
 import os
 import sys
 import click
 from vantage_sdk import VantageClient
 from vantage_sdk.core.http.exceptions import NotFoundException
-from vantage_cli.printer import Printer, ContentType, Printable
+from vantage_cli.printer import Printer, ContentType
 import uuid
 from vantage_cli.commands.util import (
     CommandExecutor,
@@ -22,15 +23,11 @@ def _upsert_parquet(
     )
 
     if response == 200:
-        return Printable.stdout(
-            content="Successfully sent to processing.",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = "Successfully sent to processing."
     else:
-        return Printable.stderr(
-            content=f"Processing failed with status {response}",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = f"Processing failed with status {response}"
+
+    return {"response": message}
 
 
 def _upsert_jsonl(
@@ -46,15 +43,11 @@ def _upsert_jsonl(
     )
 
     if response is None:
-        return Printable.stdout(
-            content="Successfully sent to processing.",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = "Successfully sent to processing."
     else:
-        return Printable.stderr(
-            content=f"Sending to processing failed with status {response}",
-            content_type=ContentType.PLAINTEXT,
-        )
+        message = f"Sending to processing failed with status {response}"
+
+    return {"response": message}
 
 
 @click.command("upsert-documents-from-parquet")
@@ -80,6 +73,9 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Upserting documents from Parquet file: {parquet_file}")
 
     # NOTE: Batch identifier MUST have a ".parquet" suffix,
     # otherwise service won't process it.
@@ -89,13 +85,13 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
 
     printer.print_text(text=f"Uploading file '{parquet_file}'...")
 
-    executor.execute_and_print_printable(
+    executor.execute_and_print_output(
         command=lambda: _upsert_parquet(
             client=client,
             collection_id=collection_id,
             parquet_file_name=parquet_file,
         ),
-        output_type=ContentType.PLAINTEXT,
+        output_type=ContentType.OBJECT,
         printer=printer,
     )
 
@@ -136,6 +132,9 @@ def upsert_documents_from_jsonl(
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Upserting documents from JSONL file: {documents_file}")
     printer.print_text(text="Uploading...")
 
     if batch_identifier is None:
@@ -143,15 +142,16 @@ def upsert_documents_from_jsonl(
             batch_identifier = {str(uuid.uuid4())}
         else:
             batch_identifier = os.path.basename(documents_file.name)
+    logger.debug(f"Batch identifier set to {batch_identifier}")
 
-    executor.execute_and_print_printable(
+    executor.execute_and_print_output(
         command=lambda: _upsert_jsonl(
             client=client,
             collection_id=collection_id,
             batch_identifier=batch_identifier,
             documents_file=documents_file,
         ),
-        output_type=ContentType.PLAINTEXT,
+        output_type=ContentType.OBJECT,
         printer=printer,
     )
 
@@ -174,7 +174,9 @@ def delete_documents(ctx, collection_id: str, document_ids: str):
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
 
+    logger.debug(f"Deleting documents with IDs: {document_ids}")
     executor.execute_and_print_output(
         command=lambda: client.delete_documents(
             collection_id=collection_id,
