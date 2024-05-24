@@ -276,10 +276,6 @@ def create_collection_openai(
     )
     logger.debug(data)
 
-    import sys
-
-    sys.exit(0)
-
     collection = OpenAICollection(
         collection_id=collection_id,
         collection_name=collection_name,
