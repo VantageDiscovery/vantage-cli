@@ -16,6 +16,29 @@ from vantage_cli.commands.util import (
 from vantage_cli.printer import Printer, ContentType
 
 
+# There is most likely a better way to check for
+# mutually exclusive options than this, but it is good enough for now.
+class MutuallyExclusiveOptionsValidator:
+    encountered = None
+
+    def validate(self, ctx, param, value):
+        if value is None:
+            return
+
+        if self.encountered is None:
+            self.encountered = param
+            return value
+
+        raise click.UsageError(
+            f"'--{param.name.replace('_', '-')}' option "
+            "cannot be used together with "
+            f"'--{self.encountered.name.replace('_', '-')}' option."
+        )
+
+
+llm_key_mutex_validator = MutuallyExclusiveOptionsValidator()
+
+
 def _delete_collection(client, collection_id: str) -> str:
     client.delete_collection(collection_id=collection_id)
 
@@ -171,8 +194,9 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--llm-secret",
     type=click.STRING,
-    required=True,
-    help="OpenAI account secret key.",
+    required=False,
+    help="OpenAI account secret key. Cannot be used with --external-account-id.",
+    callback=llm_key_mutex_validator.validate,
 )
 @click.option(
     "--llm-model-name",
@@ -184,8 +208,9 @@ def delete_collection(ctx, collection_id):
 @click.option(
     "--external-account-id",
     type=click.STRING,
-    required=True,
-    help="OpenAI account key ID from Vantage Console.",
+    required=False,
+    help="OpenAI account key ID from Vantage Console. Cannot be used with --llm-secret.",
+    callback=llm_key_mutex_validator.validate,
 )
 @click.option(
     "--secondary-external-account-id",
@@ -219,6 +244,11 @@ def create_collection_openai(
     collection_preview_url_pattern,
     embeddings_dimension,
 ):
+    if llm_secret is None and external_account_id is None:
+        raise click.UsageError(
+            "Either '--llm-secret' or '--external-account-id' must be specified."
+        )
+
     """Creates a new OpenAI collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
@@ -245,6 +275,10 @@ def create_collection_openai(
         "Creating new collection using OpenAI for embeddings with data:"
     )
     logger.debug(data)
+
+    import sys
+
+    sys.exit(0)
 
     collection = OpenAICollection(
         collection_id=collection_id,
@@ -284,12 +318,14 @@ def create_collection_openai(
     type=click.STRING,
     required=False,
     help="HuggingFace account secret.",
+    callback=llm_key_mutex_validator.validate,
 )
 @click.option(
     "--external-account-id",
     type=click.STRING,
     required=False,
     help="HuggingFace account key ID from Vantage Console.",
+    callback=llm_key_mutex_validator.validate,
 )
 @click.option(
     "--external-url",
@@ -321,6 +357,11 @@ def create_collection_hf(
     collection_preview_url_pattern,
     embeddings_dimension,
 ):
+    if llm_secret is None and external_account_id is None:
+        raise click.UsageError(
+            "Either '--llm-secret' or '--external-account-id' must be specified."
+        )
+
     """Creates a new HuggingFace collection."""
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
