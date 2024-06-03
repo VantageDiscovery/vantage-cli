@@ -55,7 +55,7 @@ def _validate_jsonl_file(
     if any(errors):
         return [error.to_dict() for error in errors]
 
-    return {"message": "OK."}
+    return {"message": "OK"}
 
 
 def _validate_parquet_file(
@@ -80,7 +80,7 @@ def _validate_parquet_file(
     if any(errors):
         return [error.to_dict() for error in errors]
 
-    return {"message": "OK."}
+    return {"message": "OK"}
 
 
 @click.command("validate-jsonl")

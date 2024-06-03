@@ -2394,18 +2394,19 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "vantage-sdk"
-version = "0.8.3"
+version = "0.8.4"
 description = "Vantage Python SDK."
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "vantage_sdk-0.8.3-py3-none-any.whl", hash = "sha256:575baa6986098c2d34805e09fe77629db73fac5f62e7905b76b94d49b1cc6122"},
-    {file = "vantage_sdk-0.8.3.tar.gz", hash = "sha256:4786875adce000a6375d01b81daad9abd0342ae25f552eb98b332881d15cfafe"},
+    {file = "vantage_sdk-0.8.4-py3-none-any.whl", hash = "sha256:60f5684a36ca764a2dc82fd9dda8e5cbce7e42032cf8f7b5e5bf09c48c0787a5"},
+    {file = "vantage_sdk-0.8.4.tar.gz", hash = "sha256:f27adfb750659c20ee1db0a06f9118f073add509d1ee9adb484592565032941e"},
 ]
 
 [package.dependencies]
 griffe-fieldz = ">=0.1.2"
 mkdocstrings = {version = ">=0.25.1", extras = ["python"]}
+pandas = ">=2.2.2,<3.0.0"
 pyarrow = ">=16.1.0"
 pydantic = ">=2"
 python-dateutil = ">=2,<3"
@@ -2519,4 +2520,4 @@ test = ["black", "flake8", "flake8-docstrings", "isort", "mypy", "pytest", "pyte
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.12"
-content-hash = "3ecf84f704e2f16980ea891e65116f058b2de2cc99b716e179f3ed39c17f3eda"
+content-hash = "dfff40b9174e415e019da529f16e774569951e7ec050e47d237b31a10f5cc52a"
