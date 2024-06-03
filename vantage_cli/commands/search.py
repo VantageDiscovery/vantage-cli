@@ -138,9 +138,9 @@ def _create_search_options(
         pagination_threshold=pagination_threshold,
     )
     sort = _create_sort(
-        field=sort_field,
-        order=sort_order,
-        mode=sort_mode,
+        sort_field=sort_field,
+        sort_order=sort_order,
+        sort_mode=sort_mode,
     )
     weighted_field_values_list = _create_weighted_field_values(
         weighted_field_values=weighted_field_values,
@@ -148,7 +148,7 @@ def _create_search_options(
     field_value_weighting = _create_field_value_weighting(
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
-        weighted_field_values=weighted_field_values_list,
+        weighted_field_values_list=weighted_field_values_list,
     )
     filter = _create_filter(
         boolean_filter=boolean_filter,
