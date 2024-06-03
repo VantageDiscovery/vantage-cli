@@ -34,6 +34,7 @@ from vantage_cli.commands.search import (
     more_like_this_search,
     semantic_search,
 )
+from vantage_cli.commands.validate import validate_jsonl, validate_parquet
 from vantage_cli.printer import create_printer
 from vantage_sdk.client import VantageClient
 from vantage_cli.commands.util import CommandExecutor, mask_sensitive_string
@@ -293,6 +294,8 @@ cli.add_command(embedding_search)
 cli.add_command(more_like_these_search)
 cli.add_command(more_like_this_search)
 cli.add_command(semantic_search)
+cli.add_command(validate_jsonl)
+cli.add_command(validate_parquet)
 
 if __name__ == "__main__":
     cli()  # pragma: no cover
