@@ -48,7 +48,7 @@ def _create_weighted_field_values(
     return items
 
 
-def _create_weight(
+def _create_field_value_weighting(
     query_key_word_max_overall_weight: Optional[float],
     query_key_word_weighting_mode: Optional[str],
     weighted_field_values_list: Optional[List[WeightedFieldValueItem]],
@@ -73,14 +73,14 @@ def _create_weight(
 def _create_pagination(
     page: Optional[int],
     items_per_page: Optional[int],
-    pagination_treshold: Optional[int],
+    pagination_threshold: Optional[int],
 ) -> Optional[Pagination]:
     if all(
         value is None
         for value in [
             page,
             items_per_page,
-            pagination_treshold,
+            pagination_threshold,
         ]
     ):
         return None
@@ -88,7 +88,7 @@ def _create_pagination(
     return Pagination(
         page=page,
         count=items_per_page,
-        threshold=pagination_treshold,
+        threshold=pagination_threshold,
     )
 
 
@@ -123,7 +123,7 @@ def _create_filter(boolean_filter: Optional[str]) -> Optional[Filter]:
 def _create_search_options(
     page: Optional[int],
     items_per_page: Optional[int],
-    pagination_treshold: Optional[int],
+    pagination_threshold: Optional[int],
     sort_field: Optional[str],
     sort_order: Optional[str],
     sort_mode: Optional[str],
@@ -135,7 +135,7 @@ def _create_search_options(
     pagination = _create_pagination(
         page=page,
         items_per_page=items_per_page,
-        pagination_treshold=pagination_treshold,
+        pagination_threshold=pagination_threshold,
     )
     sort = _create_sort(
         field=sort_field,
@@ -143,16 +143,18 @@ def _create_search_options(
         mode=sort_mode,
     )
     weighted_field_values_list = _create_weighted_field_values(
-        weighted_field_values
+        weighted_field_values=weighted_field_values,
     )
-    weight = _create_weight(
+    field_value_weighting = _create_field_value_weighting(
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
         weighted_field_values=weighted_field_values_list,
     )
-    boolean_filter = _create_filter(boolean_filter=boolean_filter)
+    filter = _create_filter(
+        boolean_filter=boolean_filter,
+    )
 
-    return [pagination, sort, weight]
+    return pagination, sort, field_value_weighting, filter
 
 
 @click.command("search-embedding")
@@ -161,12 +163,6 @@ def _create_search_options(
     type=click.STRING,
     required=True,
     help="Embedding query vector.",
-)
-@click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
 )
 @click.option(
     "--accuracy",
@@ -212,28 +208,34 @@ def _create_search_options(
     help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
 )
 @click.option(
-    "--pagination-treshold",
+    "--pagination-threshold",
     type=click.INT,
     required=False,
-    help="Pagination treshold.",
+    help="Pagination threshold.",
 )
 @click.option(
     "--query-key-word-max-overall-weight",
     type=click.STRING,
     required=False,
-    help="",
+    help="Largest increase in score with the number of key word or phrases that were matched.",
 )
 @click.option(
     "--query-key-word-weighting-mode",
     type=click.STRING,
     required=False,
-    help="",
+    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
 )
 @click.option(
     "--weighted-field-values",
     type=click.STRING,
     required=False,
-    help="",
+    help="Boost the scores for the fields, names and weights specified.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
 )
 @click.argument(
     "collection_id",
@@ -251,12 +253,12 @@ def embedding_search(
     sort_field,
     sort_order,
     sort_mode,
-    vantage_api_key,
-    collection_id,
-    pagination_treshold,
+    pagination_threshold,
     query_key_word_max_overall_weight,
     query_key_word_weighting_mode,
     weighted_field_values,
+    vantage_api_key,
+    collection_id,
 ):
     """Search based on the provided embedding vector."""
     client: VantageClient = ctx["client"]
@@ -278,10 +280,10 @@ def embedding_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight = _create_search_options(
+    pagination, sort, weight, filter = _create_search_options(
         page=page,
         items_per_page=items_per_page,
-        pagination_treshold=pagination_treshold,
+        pagination_threshold=pagination_threshold,
         sort_field=sort_field,
         sort_order=sort_order,
         sort_mode=sort_mode,
@@ -299,7 +301,7 @@ def embedding_search(
                 collection_id=collection_id,
                 accuracy=accuracy,
                 pagination=pagination,
-                filter=boolean_filter,
+                filter=filter,
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
@@ -323,12 +325,6 @@ def embedding_search(
     help="Text query.",
 )
 @click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
-)
-@click.option(
     "--accuracy",
     type=click.FLOAT,
     required=False,
@@ -372,28 +368,34 @@ def embedding_search(
     help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
 )
 @click.option(
-    "--pagination-treshold",
+    "--pagination-threshold",
     type=click.INT,
     required=False,
-    help="Pagination treshold.",
+    help="Pagination threshold.",
 )
 @click.option(
     "--query-key-word-max-overall-weight",
     type=click.STRING,
     required=False,
-    help="",
+    help="Largest increase in score with the number of key word or phrases that were matched.",
 )
 @click.option(
     "--query-key-word-weighting-mode",
     type=click.STRING,
     required=False,
-    help="",
+    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
 )
 @click.option(
     "--weighted-field-values",
     type=click.STRING,
     required=False,
-    help="",
+    help="Boost the scores for the fields, names and weights specified.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
 )
 @click.argument(
     "collection_id",
@@ -411,12 +413,12 @@ def semantic_search(
     sort_field,
     sort_order,
     sort_mode,
-    vantage_api_key,
-    collection_id,
-    pagination_treshold,
+    pagination_threshold,
     query_key_word_max_overall_weight,
     query_key_word_weighting_mode,
     weighted_field_values,
+    vantage_api_key,
+    collection_id,
 ):
     """Search based on the provided text query."""
     client: VantageClient = ctx["client"]
@@ -437,10 +439,10 @@ def semantic_search(
         "collection_id": collection_id,
     }
     logger.debug(f"Executing search with data: {data}")
-    pagination, sort, weight = _create_search_options(
+    pagination, sort, weight, filter = _create_search_options(
         page=page,
         items_per_page=items_per_page,
-        pagination_treshold=pagination_treshold,
+        pagination_threshold=pagination_threshold,
         sort_field=sort_field,
         sort_order=sort_order,
         sort_mode=sort_mode,
@@ -458,7 +460,7 @@ def semantic_search(
                 collection_id=collection_id,
                 accuracy=accuracy,
                 pagination=pagination,
-                filter=boolean_filter,
+                filter=filter,
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
@@ -482,12 +484,6 @@ def semantic_search(
     help="ID of a document in a collection.",
 )
 @click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
-)
-@click.option(
     "--accuracy",
     type=click.FLOAT,
     required=False,
@@ -530,34 +526,40 @@ def semantic_search(
     required=False,
     help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
 )
-@click.argument(
-    "collection_id",
-    type=click.STRING,
-    required=True,
-)
 @click.option(
-    "--pagination-treshold",
+    "--pagination-threshold",
     type=click.INT,
     required=False,
-    help="Pagination treshold.",
+    help="Pagination threshold.",
 )
 @click.option(
     "--query-key-word-max-overall-weight",
     type=click.STRING,
     required=False,
-    help="",
+    help="Largest increase in score with the number of key word or phrases that were matched.",
 )
 @click.option(
     "--query-key-word-weighting-mode",
     type=click.STRING,
     required=False,
-    help="",
+    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
 )
 @click.option(
     "--weighted-field-values",
     type=click.STRING,
     required=False,
-    help="",
+    help="Boost the scores for the fields, names and weights specified.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
+)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
 )
 @click.pass_obj
 def more_like_this_search(
@@ -570,12 +572,12 @@ def more_like_this_search(
     sort_field,
     sort_order,
     sort_mode,
-    vantage_api_key,
-    collection_id,
-    pagination_treshold,
+    pagination_threshold,
     query_key_word_max_overall_weight,
     query_key_word_weighting_mode,
     weighted_field_values,
+    vantage_api_key,
+    collection_id,
 ):
     """Search based on the provided document ID."""
     client: VantageClient = ctx["client"]
@@ -597,10 +599,10 @@ def more_like_this_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight = _create_search_options(
+    pagination, sort, weight, filter = _create_search_options(
         page=page,
         items_per_page=items_per_page,
-        pagination_treshold=pagination_treshold,
+        pagination_threshold=pagination_threshold,
         sort_field=sort_field,
         sort_order=sort_order,
         sort_mode=sort_mode,
@@ -618,7 +620,7 @@ def more_like_this_search(
                 collection_id=collection_id,
                 accuracy=accuracy,
                 pagination=pagination,
-                filter=boolean_filter,
+                filter=filter,
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
@@ -643,12 +645,6 @@ def more_like_this_search(
     help="Path to the JSON file containing a list of `these` objects.",
 )
 @click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
-)
-@click.option(
     "--accuracy",
     type=click.FLOAT,
     required=False,
@@ -692,28 +688,34 @@ def more_like_this_search(
     help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
 )
 @click.option(
-    "--pagination-treshold",
+    "--pagination-threshold",
     type=click.INT,
     required=False,
-    help="Pagination treshold.",
+    help="Pagination threshold.",
 )
 @click.option(
     "--query-key-word-max-overall-weight",
     type=click.STRING,
     required=False,
-    help="",
+    help="Largest increase in score with the number of key word or phrases that were matched.",
 )
 @click.option(
     "--query-key-word-weighting-mode",
     type=click.STRING,
     required=False,
-    help="",
+    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
 )
 @click.option(
     "--weighted-field-values",
     type=click.STRING,
     required=False,
-    help="",
+    help="Boost the scores for the fields, names and weights specified.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
 )
 @click.argument(
     "collection_id",
@@ -731,12 +733,12 @@ def more_like_these_search(
     sort_field,
     sort_order,
     sort_mode,
-    vantage_api_key,
-    collection_id,
-    pagination_treshold,
+    pagination_threshold,
     query_key_word_max_overall_weight,
     query_key_word_weighting_mode,
     weighted_field_values,
+    vantage_api_key,
+    collection_id,
 ):
     """
     Search based on the provided MoreLikeThese items.
@@ -772,10 +774,10 @@ def more_like_these_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight = _create_search_options(
+    pagination, sort, weight, filter = _create_search_options(
         page=page,
         items_per_page=items_per_page,
-        pagination_treshold=pagination_treshold,
+        pagination_threshold=pagination_threshold,
         sort_field=sort_field,
         sort_order=sort_order,
         sort_mode=sort_mode,
@@ -793,7 +795,7 @@ def more_like_these_search(
                 collection_id=collection_id,
                 accuracy=accuracy,
                 pagination=pagination,
-                filter=boolean_filter,
+                filter=filter,
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
