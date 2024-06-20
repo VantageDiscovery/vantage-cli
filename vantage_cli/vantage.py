@@ -24,9 +24,10 @@ from vantage_cli.commands.collections import (
     update_collection,
 )
 from vantage_cli.commands.documents import (
-    upsert_documents_from_parquet,
+    upload_documents_from_parquet,
     upsert_documents_from_jsonl,
     delete_documents,
+    upload_documents_from_jsonl,
 )
 from vantage_cli.commands.search import (
     embedding_search,
@@ -287,8 +288,9 @@ cli.add_command(delete_collection)
 cli.add_command(get_collection)
 cli.add_command(list_collections)
 cli.add_command(update_collection)
-cli.add_command(upsert_documents_from_parquet)
+cli.add_command(upload_documents_from_parquet)
 cli.add_command(upsert_documents_from_jsonl)
+cli.add_command(upload_documents_from_jsonl)
 cli.add_command(delete_documents)
 cli.add_command(embedding_search)
 cli.add_command(more_like_these_search)
