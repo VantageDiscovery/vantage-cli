@@ -12,24 +12,6 @@ from vantage_cli.commands.util import (
 )
 
 
-def _upsert_parquet(
-    client: VantageClient,
-    collection_id: str,
-    parquet_file_name: str,
-) -> str:
-    response = client.upsert_documents_from_parquet_file(
-        collection_id=collection_id,
-        parquet_file_path=parquet_file_name,
-    )
-
-    if response == 200:
-        message = "Successfully sent to processing."
-    else:
-        message = f"Processing failed with status {response}"
-
-    return {"response": message}
-
-
 def _upsert_jsonl(
     client: VantageClient,
     collection_id: str,
@@ -50,7 +32,61 @@ def _upsert_jsonl(
     return {"response": message}
 
 
-@click.command("upsert-documents-from-parquet")
+def _upload_parquet(
+    client: VantageClient,
+    collection_id: str,
+    parquet_file_name: str,
+) -> str:
+    response = client.upload_documents_from_parquet_file(
+        collection_id=collection_id,
+        parquet_file_path=parquet_file_name,
+    )
+
+    if response == 200:
+        message = "Successfully sent to processing."
+    else:
+        message = f"Processing failed with status {response}"
+
+    return {"response": message}
+
+
+def _upload_jsonl(
+    client: VantageClient,
+    collection_id: str,
+    documents_file,
+) -> str:
+    response = client.upload_documents_from_jsonl_file(
+        collection_id=collection_id,
+        jsonl_file_path=documents_file,
+    )
+
+    if response == 200:
+        message = "Successfully sent to processing."
+    else:
+        message = f"Sending to processing failed with status {response}"
+
+    return {"response": message}
+
+
+def _delete_documents(
+    client: VantageClient,
+    collection_id: str,
+    documents_ids: [str],
+) -> str:
+    response = client.delete_documents(
+        collection_id=collection_id,
+        document_ids=documents_ids,
+    )
+
+    if response is None:
+        message = "Sucessfully deleted."
+    else:
+        message = f"Deleting failed with status {response}"
+
+    return {"response": message}
+
+
+@click.command("upload-documents-from-parquet")
 @click.option(
     "--collection-id",
     type=click.STRING,
@@ -63,9 +99,9 @@ def _upsert_jsonl(
     type=click.STRING,
 )
 @click.pass_obj
-def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
+def upload_documents_from_parquet(ctx, collection_id, parquet_file):
     """
-    Upserts documents from a Parquet file.
+    Uploads documents from a Parquet file.
 
     DOCUMENTS_FILE is a file containing documents in Parquet format.
     It can be passed as a path to a file, or it can be read from stdin.
@@ -86,10 +122,62 @@ def upsert_documents_from_parquet(ctx, collection_id, parquet_file):
     printer.print_text(text=f"Uploading file '{parquet_file}'...")
 
     executor.execute_and_print_output(
-        command=lambda: _upsert_parquet(
+        command=lambda: _upload_parquet(
             client=client,
             collection_id=collection_id,
             parquet_file_name=parquet_file,
+        ),
+        output_type=ContentType.OBJECT,
+        printer=printer,
+    )
+
+
+@click.command("upload-documents-from-jsonl")
+@click.option(
+    "--collection-id",
+    type=click.STRING,
+    required=True,
+    help="Collection ID.",
+)
+@click.option(
+    "--batch-identifier",
+    type=click.STRING,
+    required=False,
+    help="Customer batch identifier.",
+)
+@click.argument(
+    "documents-file",
+    type=click.STRING,
+    required=True,
+)
+@click.pass_obj
+def upload_documents_from_jsonl(
+    ctx,
+    collection_id,
+    documents_file,
+    batch_identifier,
+):
+    """
+    Uploads documents from a JSONL file.
+
+    DOCUMENTS_FILE is a file containing documents in JSONL format.
+    It can be passed as a path to a file, or it can be read from stdin.
+    This command will replace all of the documents in a collection.
+    """
+    # TODO: implement uploading both from file and stdin
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    logger.debug(f"Upserting documents from JSONL file: {documents_file}")
+    printer.print_text(text="Uploading...")
+
+    executor.execute_and_print_output(
+        command=lambda: _upload_jsonl(
+            client=client,
+            collection_id=collection_id,
+            documents_file=documents_file,
         ),
         output_type=ContentType.OBJECT,
         printer=printer,
@@ -157,31 +245,31 @@ def upsert_documents_from_jsonl(
 
 
 @click.command("delete-documents")
-@click.argument(
-    "collection_id",
-    type=click.STRING,
-    required=True,
-)
 @click.option(
-    "--document-ids",
+    "--collection-id",
     type=click.STRING,
     required=True,
-    help="IDs of documents to delete, separated by a comma. For example: \"1, 2, 3, 4, 5\".",
 )
+@click.argument("documents-ids", type=click.STRING, required=True)
 @click.pass_obj
-def delete_documents(ctx, collection_id: str, document_ids: str):
-    """Deletes documents by ID."""
+def delete_documents(ctx, collection_id: str, documents_ids: str):
+    """
+    Deletes documents by ID.
+
+    DOCUMENTS_IDS: IDs of documents to delete, separated by a comma. For example: \"1,2,3,4,5\".
+    """
     client: VantageClient = ctx["client"]
     printer: Printer = ctx["printer"]
     executor: CommandExecutor = ctx["executor"]
     logger: Logger = ctx["logger"]
 
-    logger.debug(f"Deleting documents with IDs: {document_ids}")
+    logger.debug(f"Deleting documents with IDs: {documents_ids}")
     executor.execute_and_print_output(
-        command=lambda: client.delete_documents(
+        command=lambda: _delete_documents(
+            client=client,
             collection_id=collection_id,
-            document_ids=document_ids.split(","),
-        ).__dict__,
+            documents_ids=documents_ids.split(","),
+        ),
         output_type=ContentType.OBJECT,
         printer=printer,
         exception_handler=lambda exception: specific_exception_handler(
