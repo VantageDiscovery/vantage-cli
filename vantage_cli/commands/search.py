@@ -113,11 +113,13 @@ def _create_sort(
     )
 
 
-def _create_filter(boolean_filter: Optional[str]) -> Optional[Filter]:
-    if boolean_filter is None:
+def _create_filter(
+    boolean_filter: Optional[str], variant_filter: Optional[None]
+) -> Optional[Filter]:
+    if boolean_filter is None and variant_filter is None:
         return None
 
-    return Filter(boolean_filter=boolean_filter)
+    return Filter(boolean_filter=boolean_filter, variant_filter=variant_filter)
 
 
 def _create_search_options(
@@ -128,6 +130,7 @@ def _create_search_options(
     sort_order: Optional[str],
     sort_mode: Optional[str],
     boolean_filter: Optional[str],
+    variant_filter: Optional[str],
     weighted_field_values: str,
     query_key_word_max_overall_weight: Optional[float],
     query_key_word_weighting_mode: Optional[str],
@@ -151,7 +154,7 @@ def _create_search_options(
         weighted_field_values_list=weighted_field_values_list,
     )
     filter = _create_filter(
-        boolean_filter=boolean_filter,
+        boolean_filter=boolean_filter, variant_filter=variant_filter
     )
 
     return pagination, sort, field_value_weighting, filter
@@ -185,6 +188,12 @@ def _create_search_options(
 )
 @click.option(
     "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--variant-filter",
     type=click.STRING,
     required=False,
     help="Search filter.",
@@ -250,6 +259,7 @@ def embedding_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -350,6 +360,12 @@ def embedding_search(
     help="Search filter.",
 )
 @click.option(
+    "--variant-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
     "--sort-field",
     type=click.STRING,
     required=False,
@@ -410,6 +426,7 @@ def semantic_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -447,6 +464,7 @@ def semantic_search(
         sort_order=sort_order,
         sort_mode=sort_mode,
         boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
@@ -504,6 +522,12 @@ def semantic_search(
 )
 @click.option(
     "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--variant-filter",
     type=click.STRING,
     required=False,
     help="Search filter.",
@@ -569,6 +593,7 @@ def more_like_this_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -607,6 +632,7 @@ def more_like_this_search(
         sort_order=sort_order,
         sort_mode=sort_mode,
         boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
@@ -665,6 +691,12 @@ def more_like_this_search(
 )
 @click.option(
     "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--variant-filter",
     type=click.STRING,
     required=False,
     help="Search filter.",
@@ -730,6 +762,7 @@ def more_like_these_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -782,6 +815,7 @@ def more_like_these_search(
         sort_order=sort_order,
         sort_mode=sort_mode,
         boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
