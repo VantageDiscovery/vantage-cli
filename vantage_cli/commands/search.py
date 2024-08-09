@@ -13,6 +13,8 @@ from vantage_sdk.model.search import (
     WeightedFieldValueItem,
     Sort,
     Filter,
+    Facet,
+    FacetType,
 )
 
 from vantage_cli.printer import Printer, Printable, ContentType
@@ -113,11 +115,45 @@ def _create_sort(
     )
 
 
-def _create_filter(boolean_filter: Optional[str]) -> Optional[Filter]:
-    if boolean_filter is None:
+def _create_filter(
+    boolean_filter: Optional[str], variant_filter: Optional[None]
+) -> Optional[Filter]:
+    if boolean_filter is None and variant_filter is None:
         return None
 
-    return Filter(boolean_filter=boolean_filter)
+    return Filter(boolean_filter=boolean_filter, variant_filter=variant_filter)
+
+
+def _create_facets_from_json(facets_json: str) -> list[Facet]:
+    parsed_facets = jsonpickle.loads(facets_json)
+    facets = []
+    for parsed_facet in parsed_facets:
+        facet_name = parsed_facet.get("name", None)
+        if facet_name is None:
+            raise click.UsageError(
+                "Invalid facets JSON, missing a \"name\" field in a facet."
+            )
+
+        parsed_facet_type = parsed_facet.get("type", None)
+        if parsed_facet_type is None:
+            raise click.UsageError(
+                "Invalid facets JSON, facets must have type field declared."
+            )
+
+        try:
+            facet_type = FacetType[parsed_facet_type.upper()]
+        except KeyError as exception:
+            raise click.UsageError(
+                f"Invalid facets JSON, unknown facet type \"{exception.args[0]}\"."
+            )
+
+        facet_values = parsed_facet.get("values", [])
+
+        facets.append(
+            Facet(name=facet_name, type=facet_type, values=facet_values)
+        )
+
+    return facets
 
 
 def _create_search_options(
@@ -128,9 +164,11 @@ def _create_search_options(
     sort_order: Optional[str],
     sort_mode: Optional[str],
     boolean_filter: Optional[str],
+    variant_filter: Optional[str],
     weighted_field_values: str,
     query_key_word_max_overall_weight: Optional[float],
     query_key_word_weighting_mode: Optional[str],
+    facets_json: Optional[str],
 ) -> tuple:
     pagination = _create_pagination(
         page=page,
@@ -150,11 +188,14 @@ def _create_search_options(
         query_key_word_weighting_mode=query_key_word_weighting_mode,
         weighted_field_values_list=weighted_field_values_list,
     )
-    filter = _create_filter(
-        boolean_filter=boolean_filter,
+    filter = (
+        _create_filter(
+            boolean_filter=boolean_filter, variant_filter=variant_filter
+        ),
     )
+    facets = _create_facets_from_json(facets_json=facets_json)
 
-    return pagination, sort, field_value_weighting, filter
+    return pagination, sort, field_value_weighting, filter, facets
 
 
 @click.command("search-embedding")
@@ -185,6 +226,12 @@ def _create_search_options(
 )
 @click.option(
     "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--variant-filter",
     type=click.STRING,
     required=False,
     help="Search filter.",
@@ -237,6 +284,12 @@ def _create_search_options(
     required=True,
     help="Vantage API key used for search.",
 )
+@click.option(
+    "--facets",
+    type=click.STRING,
+    required=False,
+    help="Search facets JSON.",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -250,6 +303,7 @@ def embedding_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -258,6 +312,7 @@ def embedding_search(
     query_key_word_weighting_mode,
     weighted_field_values,
     vantage_api_key,
+    facets,
     collection_id,
 ):
     """Search based on the provided embedding vector."""
@@ -280,7 +335,7 @@ def embedding_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight, filter = _create_search_options(
+    pagination, sort, weight, filter, facets_list = _create_search_options(
         page=page,
         items_per_page=items_per_page,
         pagination_threshold=pagination_threshold,
@@ -291,6 +346,7 @@ def embedding_search(
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
+        facets_json=facets,
     )
 
     executor.execute_and_print_output(
@@ -305,6 +361,7 @@ def embedding_search(
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
+                facets=facets_list,
             ).results
         ],
         output_type=ContentType.OBJECT,
@@ -350,160 +407,7 @@ def embedding_search(
     help="Search filter.",
 )
 @click.option(
-    "--sort-field",
-    type=click.STRING,
-    required=False,
-    help="Sorting field.",
-)
-@click.option(
-    "--sort-order",
-    type=click.STRING,
-    required=False,
-    help="Sorting order. Supported values (\"asc\"|\"desc\").",
-)
-@click.option(
-    "--sort-mode",
-    type=click.STRING,
-    required=False,
-    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
-)
-@click.option(
-    "--pagination-threshold",
-    type=click.INT,
-    required=False,
-    help="Pagination threshold.",
-)
-@click.option(
-    "--query-key-word-max-overall-weight",
-    type=click.STRING,
-    required=False,
-    help="Largest increase in score with the number of key word or phrases that were matched.",
-)
-@click.option(
-    "--query-key-word-weighting-mode",
-    type=click.STRING,
-    required=False,
-    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
-)
-@click.option(
-    "--weighted-field-values",
-    type=click.STRING,
-    required=False,
-    help="Boost the scores for the fields, names and weights specified.",
-)
-@click.option(
-    "--vantage-api-key",
-    type=click.STRING,
-    required=True,
-    help="Vantage API key used for search.",
-)
-@click.argument(
-    "collection_id",
-    type=click.STRING,
-    required=True,
-)
-@click.pass_obj
-def semantic_search(
-    ctx,
-    text,
-    accuracy,
-    page,
-    items_per_page,
-    boolean_filter,
-    sort_field,
-    sort_order,
-    sort_mode,
-    pagination_threshold,
-    query_key_word_max_overall_weight,
-    query_key_word_weighting_mode,
-    weighted_field_values,
-    vantage_api_key,
-    collection_id,
-):
-    """Search based on the provided text query."""
-    client: VantageClient = ctx["client"]
-    printer: Printer = ctx["printer"]
-    executor: CommandExecutor = ctx["executor"]
-    logger: Logger = ctx["logger"]
-
-    data = {
-        "text": text,
-        "accuracy": accuracy,
-        "page": page,
-        "items_per_page": items_per_page,
-        "boolean_filter": boolean_filter,
-        "sort_field": sort_field,
-        "sort_order": sort_order,
-        "sort_mode": sort_mode,
-        "vantage_api_key": mask_sensitive_string(vantage_api_key),
-        "collection_id": collection_id,
-    }
-    logger.debug(f"Executing search with data: {data}")
-    pagination, sort, weight, filter = _create_search_options(
-        page=page,
-        items_per_page=items_per_page,
-        pagination_threshold=pagination_threshold,
-        sort_field=sort_field,
-        sort_order=sort_order,
-        sort_mode=sort_mode,
-        boolean_filter=boolean_filter,
-        weighted_field_values=weighted_field_values,
-        query_key_word_max_overall_weight=query_key_word_max_overall_weight,
-        query_key_word_weighting_mode=query_key_word_weighting_mode,
-    )
-
-    executor.execute_and_print_output(
-        command=lambda: [
-            item.__dict__
-            for item in client.semantic_search(
-                text=text,
-                collection_id=collection_id,
-                accuracy=accuracy,
-                pagination=pagination,
-                filter=filter,
-                sort=sort,
-                field_value_weighting=weight,
-                vantage_api_key=vantage_api_key,
-            ).results
-        ],
-        output_type=ContentType.OBJECT,
-        printer=printer,
-        exception_handler=lambda exception: specific_exception_handler(
-            exception=exception,
-            class_type=NotFoundException,
-            message="Collection not found.",
-        ),
-    )
-
-
-@click.command("search-more-like-this")
-@click.option(
-    "--document_id",
-    type=click.STRING,
-    required=True,
-    help="ID of a document in a collection.",
-)
-@click.option(
-    "--accuracy",
-    type=click.FLOAT,
-    required=False,
-    default=0.3,
-    help="Search accuracy.",
-)
-@click.option(
-    "--page",
-    type=click.INT,
-    required=False,
-    help="Search page.",
-)
-@click.option(
-    "--items-per-page",
-    type=click.INT,
-    required=False,
-    help="Items returned per search page.",
-)
-@click.option(
-    "--boolean-filter",
+    "--variant-filter",
     type=click.STRING,
     required=False,
     help="Search filter.",
@@ -556,6 +460,188 @@ def semantic_search(
     required=True,
     help="Vantage API key used for search.",
 )
+@click.option(
+    "--facets",
+    type=click.STRING,
+    required=False,
+    help="Search facets JSON.",
+)
+@click.argument(
+    "collection_id",
+    type=click.STRING,
+    required=True,
+)
+@click.pass_obj
+def semantic_search(
+    ctx,
+    text,
+    accuracy,
+    page,
+    items_per_page,
+    boolean_filter,
+    variant_filter,
+    sort_field,
+    sort_order,
+    sort_mode,
+    pagination_threshold,
+    query_key_word_max_overall_weight,
+    query_key_word_weighting_mode,
+    weighted_field_values,
+    vantage_api_key,
+    facets,
+    collection_id,
+):
+    """Search based on the provided text query."""
+    client: VantageClient = ctx["client"]
+    printer: Printer = ctx["printer"]
+    executor: CommandExecutor = ctx["executor"]
+    logger: Logger = ctx["logger"]
+
+    data = {
+        "text": text,
+        "accuracy": accuracy,
+        "page": page,
+        "items_per_page": items_per_page,
+        "boolean_filter": boolean_filter,
+        "sort_field": sort_field,
+        "sort_order": sort_order,
+        "sort_mode": sort_mode,
+        "vantage_api_key": mask_sensitive_string(vantage_api_key),
+        "collection_id": collection_id,
+    }
+    logger.debug(f"Executing search with data: {data}")
+    pagination, sort, weight, filter, facets_list = _create_search_options(
+        page=page,
+        items_per_page=items_per_page,
+        pagination_threshold=pagination_threshold,
+        sort_field=sort_field,
+        sort_order=sort_order,
+        sort_mode=sort_mode,
+        boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
+        weighted_field_values=weighted_field_values,
+        query_key_word_max_overall_weight=query_key_word_max_overall_weight,
+        query_key_word_weighting_mode=query_key_word_weighting_mode,
+        facets_json=facets,
+    )
+
+    executor.execute_and_print_output(
+        command=lambda: [
+            item.__dict__
+            for item in client.semantic_search(
+                text=text,
+                collection_id=collection_id,
+                accuracy=accuracy,
+                pagination=pagination,
+                filter=filter,
+                sort=sort,
+                field_value_weighting=weight,
+                vantage_api_key=vantage_api_key,
+                facets=facets_list,
+            ).results
+        ],
+        output_type=ContentType.OBJECT,
+        printer=printer,
+        exception_handler=lambda exception: specific_exception_handler(
+            exception=exception,
+            class_type=NotFoundException,
+            message="Collection not found.",
+        ),
+    )
+
+
+@click.command("search-more-like-this")
+@click.option(
+    "--document_id",
+    type=click.STRING,
+    required=True,
+    help="ID of a document in a collection.",
+)
+@click.option(
+    "--accuracy",
+    type=click.FLOAT,
+    required=False,
+    default=0.3,
+    help="Search accuracy.",
+)
+@click.option(
+    "--page",
+    type=click.INT,
+    required=False,
+    help="Search page.",
+)
+@click.option(
+    "--items-per-page",
+    type=click.INT,
+    required=False,
+    help="Items returned per search page.",
+)
+@click.option(
+    "--boolean-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--variant-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
+    "--sort-field",
+    type=click.STRING,
+    required=False,
+    help="Sorting field.",
+)
+@click.option(
+    "--sort-order",
+    type=click.STRING,
+    required=False,
+    help="Sorting order. Supported values (\"asc\"|\"desc\").",
+)
+@click.option(
+    "--sort-mode",
+    type=click.STRING,
+    required=False,
+    help="Sorting mode. Supported values (\"semantic_threshold\"|\"field_selection\").",
+)
+@click.option(
+    "--pagination-threshold",
+    type=click.INT,
+    required=False,
+    help="Pagination threshold.",
+)
+@click.option(
+    "--query-key-word-max-overall-weight",
+    type=click.STRING,
+    required=False,
+    help="Largest increase in score with the number of key word or phrases that were matched.",
+)
+@click.option(
+    "--query-key-word-weighting-mode",
+    type=click.STRING,
+    required=False,
+    help="Weighting mode on keywords. Supported values (\"none\"|\"uniform\"|\"weighted\")",
+)
+@click.option(
+    "--weighted-field-values",
+    type=click.STRING,
+    required=False,
+    help="Boost the scores for the fields, names and weights specified.",
+)
+@click.option(
+    "--vantage-api-key",
+    type=click.STRING,
+    required=True,
+    help="Vantage API key used for search.",
+)
+@click.option(
+    "--facets",
+    type=click.STRING,
+    required=False,
+    help="Search facets JSON.",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -569,6 +655,7 @@ def more_like_this_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -577,6 +664,7 @@ def more_like_this_search(
     query_key_word_weighting_mode,
     weighted_field_values,
     vantage_api_key,
+    facets,
     collection_id,
 ):
     """Search based on the provided document ID."""
@@ -599,7 +687,7 @@ def more_like_this_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight, filter = _create_search_options(
+    pagination, sort, weight, filter, facets_list = _create_search_options(
         page=page,
         items_per_page=items_per_page,
         pagination_threshold=pagination_threshold,
@@ -607,9 +695,11 @@ def more_like_this_search(
         sort_order=sort_order,
         sort_mode=sort_mode,
         boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
+        facets_json=facets,
     )
 
     executor.execute_and_print_output(
@@ -624,6 +714,7 @@ def more_like_this_search(
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
+                facets=facets_list,
             ).results
         ],
         output_type=ContentType.OBJECT,
@@ -670,6 +761,12 @@ def more_like_this_search(
     help="Search filter.",
 )
 @click.option(
+    "--variant-filter",
+    type=click.STRING,
+    required=False,
+    help="Search filter.",
+)
+@click.option(
     "--sort-field",
     type=click.STRING,
     required=False,
@@ -717,6 +814,12 @@ def more_like_this_search(
     required=True,
     help="Vantage API key used for search.",
 )
+@click.option(
+    "--facets",
+    type=click.STRING,
+    required=False,
+    help="Search facets JSON.",
+)
 @click.argument(
     "collection_id",
     type=click.STRING,
@@ -730,6 +833,7 @@ def more_like_these_search(
     page,
     items_per_page,
     boolean_filter,
+    variant_filter,
     sort_field,
     sort_order,
     sort_mode,
@@ -738,6 +842,7 @@ def more_like_these_search(
     query_key_word_weighting_mode,
     weighted_field_values,
     vantage_api_key,
+    facets,
     collection_id,
 ):
     """
@@ -774,7 +879,7 @@ def more_like_these_search(
     }
     logger.debug(f"Executing search with data: {data}")
 
-    pagination, sort, weight, filter = _create_search_options(
+    pagination, sort, weight, filter, facets_list = _create_search_options(
         page=page,
         items_per_page=items_per_page,
         pagination_threshold=pagination_threshold,
@@ -782,9 +887,11 @@ def more_like_these_search(
         sort_order=sort_order,
         sort_mode=sort_mode,
         boolean_filter=boolean_filter,
+        variant_filter=variant_filter,
         weighted_field_values=weighted_field_values,
         query_key_word_max_overall_weight=query_key_word_max_overall_weight,
         query_key_word_weighting_mode=query_key_word_weighting_mode,
+        facets_json=facets,
     )
 
     executor.execute_and_print_output(
@@ -799,6 +906,7 @@ def more_like_these_search(
                 sort=sort,
                 field_value_weighting=weight,
                 vantage_api_key=vantage_api_key,
+                facets=facets_list,
             ).results
         ],
         output_type=ContentType.OBJECT,
